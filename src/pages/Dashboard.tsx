@@ -7,7 +7,7 @@ import { clients, dashboardStats, todaysFocus } from "../data/studioData";
 
 export function Dashboard() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div className="grid gap-4 lg:grid-cols-3">
         {dashboardStats.map((stat) => (
           <MetricCard
@@ -20,7 +20,7 @@ export function Dashboard() {
         ))}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+      <div className="grid gap-6 xl:grid-cols-[1.28fr_0.72fr]">
         <Card>
           <CardBody>
             <SectionTitle
@@ -36,19 +36,19 @@ export function Dashboard() {
             <div className="space-y-3">
               {clients.map((client) => (
                 <div
-                  className="rounded-2xl border border-studio-line bg-studio-panel/70 p-4 transition duration-200 hover:border-studio-soft/60 hover:bg-white"
+                  className="rounded-2xl border border-studio-line/70 bg-studio-panel/48 p-4 transition duration-200 hover:border-studio-soft/45 hover:bg-white/72"
                   key={client.name}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <h3 className="font-semibold tracking-[-0.02em] text-studio-ink">
+                      <h3 className="font-display text-2xl leading-none tracking-[-0.02em] text-studio-ink">
                         {client.name}
                       </h3>
-                      <p className="mt-1 text-sm text-studio-muted">{client.project}</p>
+                      <p className="mt-2 text-[13px] text-studio-muted">{client.project}</p>
                     </div>
-                    <p className="text-sm font-semibold text-studio-ink">{client.value}</p>
+                    <p className="text-sm font-semibold tracking-[-0.02em] text-studio-ink">{client.value}</p>
                   </div>
-                  <div className="mt-4 flex flex-col gap-2 text-sm text-studio-muted sm:flex-row sm:items-center sm:justify-between">
+                  <div className="mt-4 flex flex-col gap-2 text-[13px] text-studio-muted sm:flex-row sm:items-center sm:justify-between">
                     <span>{client.status}</span>
                     <span>{client.nextStep}</span>
                   </div>
@@ -58,23 +58,23 @@ export function Dashboard() {
           </CardBody>
         </Card>
 
-        <Card className="bg-studio-ink text-white">
+        <Card className="bg-studio-warm/78">
           <CardBody>
-            <div className="flex items-center gap-2 text-sm font-medium text-white/80">
+            <div className="flex items-center gap-2 text-sm font-medium text-studio-muted">
               <Sparkles aria-hidden="true" className="h-4 w-4 text-studio-purple" />
               Studio briefing
             </div>
-            <h2 className="mt-5 text-2xl font-semibold tracking-[-0.045em]">
+            <h2 className="mt-5 font-display text-4xl leading-[0.95] tracking-[-0.025em] text-studio-ink">
               Protect deep work while keeping revenue moving.
             </h2>
-            <p className="mt-3 text-sm leading-6 text-white/68">
+            <p className="mt-4 text-sm leading-6 text-studio-muted">
               Three items need attention before tomorrow's client block.
             </p>
             <div className="mt-6 space-y-3">
               {todaysFocus.map((item) => (
-                <div className="flex gap-3 rounded-2xl bg-white/7 p-3" key={item}>
+                <div className="flex gap-3 rounded-2xl border border-studio-line/65 bg-white/54 p-3" key={item}>
                   <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-studio-purple" />
-                  <p className="text-sm leading-5 text-white/82">{item}</p>
+                  <p className="text-sm leading-5 text-studio-muted">{item}</p>
                 </div>
               ))}
             </div>

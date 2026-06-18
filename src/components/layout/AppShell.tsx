@@ -21,10 +21,10 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
   return (
     <div className="min-h-screen md:flex">
       <Sidebar activeRoute={activeRoute} onNavigate={onNavigate} />
-      <main className="min-w-0 flex-1 px-4 sm:px-6 lg:px-8">
+      <main className="min-w-0 flex-1 px-4 sm:px-6 lg:px-10">
         <TopBar onQuickCreate={() => setQuickCreateOpen(true)} />
         <MobileNav activeRoute={activeRoute} onNavigate={onNavigate} />
-        <div className="mx-auto w-full max-w-7xl pb-10">{children}</div>
+        <div className="mx-auto w-full max-w-[1180px] pb-14">{children}</div>
       </main>
 
       <Modal
@@ -36,7 +36,7 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
         <div className="space-y-4">
           <Input label="Title" placeholder="Atlas Mobile proposal update" />
           <Input label="Type" placeholder="Client note, proposal, inspiration..." />
-          <div className="rounded-2xl border border-studio-line bg-studio-panel p-4">
+          <div className="rounded-2xl border border-studio-line/75 bg-studio-panel/75 p-4">
             <div className="flex items-center gap-2 text-sm font-medium text-studio-ink">
               <Sparkles aria-hidden="true" className="h-4 w-4 text-studio-purple" />
               AI suggestion

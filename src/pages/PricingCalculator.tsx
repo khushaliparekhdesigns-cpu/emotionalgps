@@ -10,10 +10,10 @@ export function PricingCalculator() {
     <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
       <Card>
         <CardBody>
-          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-studio-line bg-studio-panel">
+          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-studio-line/75 bg-studio-panel/64">
             <Calculator aria-hidden="true" className="h-5 w-5 text-studio-purple" />
           </div>
-          <h2 className="mt-5 text-xl font-semibold tracking-[-0.04em] text-studio-ink">
+          <h2 className="mt-5 font-display text-4xl leading-none tracking-[-0.02em] text-studio-ink">
             Scope inputs
           </h2>
           <p className="mt-2 text-sm leading-6 text-studio-muted">
@@ -34,12 +34,12 @@ export function PricingCalculator() {
 
       <div className="space-y-4">
         {pricingScenarios.map((scenario) => (
-          <Card className="hover:-translate-y-0.5 hover:shadow-[0_22px_70px_rgba(29,29,31,0.07)]" key={scenario.package}>
+          <Card className="hover:-translate-y-0.5 hover:border-studio-line hover:shadow-[0_1px_1px_rgba(33,31,27,0.04),0_20px_46px_rgba(33,31,27,0.05)]" key={scenario.package}>
             <CardBody>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <Badge tone="accent">{scenario.margin} margin</Badge>
-                  <h3 className="mt-3 text-lg font-semibold tracking-[-0.035em] text-studio-ink">
+                  <h3 className="mt-3 font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
                     {scenario.package}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-studio-muted">{scenario.scope}</p>

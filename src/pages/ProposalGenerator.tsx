@@ -7,13 +7,13 @@ import { proposalSections } from "../data/studioData";
 
 export function ProposalGenerator() {
   return (
-    <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
+    <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
       <Card>
         <CardBody>
-          <h2 className="text-base font-semibold tracking-[-0.02em] text-studio-ink">
+          <h2 className="font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
             Proposal intake
           </h2>
-          <p className="mt-1 text-sm leading-6 text-studio-muted">
+          <p className="mt-2 text-sm leading-6 text-studio-muted">
             Lightweight inputs for a future AI-generated proposal draft.
           </p>
           <div className="mt-5 space-y-4">
@@ -33,7 +33,7 @@ export function ProposalGenerator() {
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
               <Badge tone="accent">Preview</Badge>
-              <h2 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-studio-ink">
+              <h2 className="mt-3 font-display text-4xl leading-[0.95] tracking-[-0.025em] text-studio-ink">
                 Product onboarding redesign proposal
               </h2>
             </div>
@@ -44,16 +44,16 @@ export function ProposalGenerator() {
           <div className="space-y-3">
             {proposalSections.map((section, index) => (
               <div
-                className="flex gap-4 rounded-2xl border border-studio-line bg-studio-panel/70 p-4"
+                className="flex gap-4 rounded-2xl border border-studio-line/70 bg-studio-panel/48 p-4"
                 key={section}
               >
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-sm font-semibold text-studio-purple">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/70 text-sm font-semibold text-studio-purple">
                   {index + 1}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <FileText aria-hidden="true" className="h-4 w-4 text-studio-soft" />
-                    <h3 className="font-semibold tracking-[-0.02em] text-studio-ink">
+                    <h3 className="font-display text-2xl leading-none tracking-[-0.02em] text-studio-ink">
                       {section}
                     </h3>
                   </div>

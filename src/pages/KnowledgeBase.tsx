@@ -12,10 +12,10 @@ export function KnowledgeBase() {
         <CardBody>
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-base font-semibold tracking-[-0.02em] text-studio-ink">
+              <h2 className="font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
                 Studio operating system
               </h2>
-              <p className="mt-1 text-sm text-studio-muted">
+              <p className="mt-2 text-sm text-studio-muted">
                 Reusable templates and context for consistent client delivery.
               </p>
             </div>
@@ -27,11 +27,11 @@ export function KnowledgeBase() {
           <div className="grid gap-3 md:grid-cols-3">
             {knowledgeItems.map((item) => (
               <article
-                className="rounded-2xl border border-studio-line bg-studio-panel/60 p-4 transition duration-200 hover:border-studio-soft/60 hover:bg-white"
+                className="rounded-2xl border border-studio-line/70 bg-studio-panel/48 p-4 transition duration-200 hover:border-studio-soft/45 hover:bg-white/72"
                 key={item.title}
               >
                 <FileCheck2 aria-hidden="true" className="h-5 w-5 text-studio-purple" />
-                <h3 className="mt-4 font-semibold tracking-[-0.02em] text-studio-ink">
+                <h3 className="mt-4 font-display text-2xl leading-none tracking-[-0.02em] text-studio-ink">
                   {item.title}
                 </h3>
                 <div className="mt-4 flex items-center justify-between gap-3">

@@ -10,10 +10,10 @@ export function InspirationLibrary() {
       <Card>
         <CardBody className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-base font-semibold tracking-[-0.02em] text-studio-ink">
+            <h2 className="font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
               Curated references
             </h2>
-            <p className="mt-1 text-sm text-studio-muted">
+            <p className="mt-2 text-sm text-studio-muted">
               Save patterns with enough context to reuse them intentionally.
             </p>
           </div>
@@ -30,18 +30,18 @@ export function InspirationLibrary() {
       <div className="grid gap-4 md:grid-cols-3">
         {inspirationItems.map((item, index) => (
           <Card
-            className="overflow-hidden hover:-translate-y-0.5 hover:shadow-[0_22px_70px_rgba(29,29,31,0.07)]"
+            className="overflow-hidden hover:-translate-y-0.5 hover:border-studio-line hover:shadow-[0_1px_1px_rgba(33,31,27,0.04),0_20px_46px_rgba(33,31,27,0.05)]"
             key={item.title}
           >
-            <div className="h-40 border-b border-studio-line bg-[linear-gradient(135deg,#fbfaf8,#f0eeff)] p-4">
-              <div className="h-full rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm">
+            <div className="h-40 border-b border-studio-line/65 bg-[linear-gradient(135deg,#fbf8f2,#f3eee4_55%,#f1edff)] p-4">
+              <div className="h-full rounded-2xl border border-white/70 bg-white/48 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="h-2 w-20 rounded-full bg-studio-line" />
+                  <span className="h-2 w-20 rounded-full bg-studio-line/80" />
                   <Bookmark aria-hidden="true" className="h-4 w-4 text-studio-purple" />
                 </div>
                 <div className="mt-8 space-y-2">
-                  <span className="block h-3 w-3/4 rounded-full bg-studio-line" />
-                  <span className="block h-3 w-1/2 rounded-full bg-studio-line" />
+                  <span className="block h-3 w-3/4 rounded-full bg-studio-line/75" />
+                  <span className="block h-3 w-1/2 rounded-full bg-studio-line/65" />
                 </div>
                 <div className="mt-6 grid grid-cols-3 gap-2">
                   {Array.from({ length: 3 }).map((_, swatchIndex) => (
@@ -55,7 +55,7 @@ export function InspirationLibrary() {
             </div>
             <CardBody>
               <p className="text-xs font-medium text-studio-soft">Reference {index + 1}</p>
-              <h3 className="mt-2 font-semibold tracking-[-0.02em] text-studio-ink">
+              <h3 className="mt-2 font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
                 {item.title}
               </h3>
               <p className="mt-1 text-sm text-studio-muted">{item.source}</p>
