@@ -1,17 +1,27 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap");
 @import "tailwindcss";
+
+@font-face {
+  font-display: swap;
+  font-family: "Krylon";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/fonts/krylon-regular.otf") format("opentype");
+}
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-studio-bg: #f7f6f3;
+  --font-display: "Krylon", ui-serif, Georgia, serif;
+  --color-studio-bg: #f6f3ee;
   --color-studio-surface: #ffffff;
-  --color-studio-panel: #fbfaf8;
-  --color-studio-line: #e8e5df;
-  --color-studio-ink: #1d1d1f;
-  --color-studio-muted: #74716c;
-  --color-studio-soft: #a29d95;
-  --color-studio-purple: #7667e8;
-  --color-studio-purple-soft: #f0eeff;
+  --color-studio-panel: #fbf8f2;
+  --color-studio-line: #e7e0d6;
+  --color-studio-ink: #211f1b;
+  --color-studio-muted: #736e66;
+  --color-studio-soft: #a59b8d;
+  --color-studio-purple: #7462d6;
+  --color-studio-purple-soft: #f1edff;
+  --color-studio-warm: #faf4e9;
 }
 
 * {
@@ -20,8 +30,8 @@
 
 html {
   min-width: 320px;
-  background: #f7f6f3;
-  color: #1d1d1f;
+  background: #f6f3ee;
+  color: #211f1b;
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   font-feature-settings:
     "cv02" 1,
@@ -36,8 +46,10 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(118, 103, 232, 0.08), transparent 34rem),
-    linear-gradient(180deg, #fbfaf8 0%, #f7f6f3 42%, #f1efea 100%);
+    radial-gradient(circle at 10% 0%, rgba(116, 98, 214, 0.055), transparent 28rem),
+    radial-gradient(circle at 86% 12%, rgba(186, 143, 86, 0.06), transparent 22rem),
+    linear-gradient(180deg, #fbf8f2 0%, #f6f3ee 48%, #f1ece4 100%);
+  line-height: 1.5;
 }
 
 button,
@@ -52,6 +64,18 @@ button {
 
 ::selection {
   background: rgba(118, 103, 232, 0.18);
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Krylon", ui-serif, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.018em;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 #root {

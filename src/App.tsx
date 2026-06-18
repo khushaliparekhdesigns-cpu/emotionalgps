@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { AppShell } from "./components/layout/AppShell";
 import { PageHeader } from "./components/layout/PageHeader";
 import { Button } from "./components/ui/Button";
@@ -59,16 +59,10 @@ export default function App() {
     <AppShell activeRoute={activeRoute} onNavigate={navigate}>
       <PageHeader
         actions={
-          <>
-            <Button variant="secondary">
-              Roadmap
-              <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
-            </Button>
-            <Button variant="quiet">
-              <Sparkles aria-hidden="true" className="h-4 w-4" />
-              Ask AI
-            </Button>
-          </>
+          <Button variant="quiet">
+            <Sparkles aria-hidden="true" className="h-4 w-4" />
+            Ask AI
+          </Button>
         }
         route={activeRoute}
       />

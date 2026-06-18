@@ -16,3 +16,27 @@ export type RouteKey =
   | "proposals"
   | "pricing"
   | "business";
+
+export type TaskStatus = "overdue" | "today" | "upcoming" | "done";
+
+export type StudioTask = {
+  client: string;
+  due: string;
+  status: TaskStatus;
+  title: string;
+};
+
+export type StudioEvent = {
+  date: string;
+  day: string;
+  label: string;
+  time: string;
+  type: "call" | "review" | "deadline";
+};
+
+export type StudioNotification = {
+  message: string;
+  meta: string;
+  tone: "neutral" | "attention" | "success";
+  title: string;
+};

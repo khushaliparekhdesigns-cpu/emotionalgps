@@ -12,13 +12,13 @@ type EmptyStateProps = {
 
 export function EmptyState({ action, children, eyebrow, title }: EmptyStateProps) {
   return (
-    <Card className="border-dashed bg-studio-panel/70">
+    <Card className="border-dashed bg-studio-panel/58">
       <CardBody className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-studio-soft">
             {eyebrow}
           </p>
-          <h3 className="mt-2 text-base font-semibold tracking-[-0.02em] text-studio-ink">
+          <h3 className="mt-2 font-display text-2xl leading-none tracking-[-0.02em] text-studio-ink">
             {title}
           </h3>
           {children ? (

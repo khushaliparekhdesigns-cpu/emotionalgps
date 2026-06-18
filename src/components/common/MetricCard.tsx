@@ -10,21 +10,21 @@ type MetricCardProps = {
 
 export function MetricCard({ change, label, note, value }: MetricCardProps) {
   return (
-    <Card className="hover:-translate-y-0.5 hover:shadow-[0_22px_70px_rgba(29,29,31,0.07)]">
+    <Card className="hover:-translate-y-0.5 hover:border-studio-line hover:shadow-[0_1px_1px_rgba(33,31,27,0.04),0_20px_46px_rgba(33,31,27,0.05)]">
       <CardBody>
         <div className="flex items-start justify-between gap-4">
-          <p className="text-sm font-medium text-studio-muted">{label}</p>
+          <p className="text-[13px] font-medium text-studio-muted">{label}</p>
           {change ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-studio-purple-soft px-2 py-1 text-xs font-medium text-studio-purple">
+            <span className="inline-flex items-center gap-1 rounded-full bg-studio-purple-soft/76 px-2 py-1 text-[11px] font-medium text-studio-purple">
               {change}
               <ArrowUpRight aria-hidden="true" className="h-3 w-3" />
             </span>
           ) : null}
         </div>
-        <p className="mt-4 text-3xl font-semibold tracking-[-0.055em] text-studio-ink">
+        <p className="mt-5 text-[2rem] font-semibold leading-none tracking-[-0.055em] text-studio-ink">
           {value}
         </p>
-        {note ? <p className="mt-2 text-sm text-studio-muted">{note}</p> : null}
+        {note ? <p className="mt-3 text-[13px] leading-6 text-studio-muted">{note}</p> : null}
       </CardBody>
     </Card>
   );

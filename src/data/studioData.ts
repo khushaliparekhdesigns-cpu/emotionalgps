@@ -1,3 +1,5 @@
+import type { StudioEvent, StudioNotification, StudioTask } from "../types";
+
 export const dashboardStats = [
   {
     label: "Revenue booked",
@@ -23,6 +25,78 @@ export const todaysFocus = [
   "Send onboarding checklist to Northstar Labs",
   "Review pricing scenario for Atlas Mobile redesign",
   "Turn workshop notes into a proposal outline",
+];
+
+export const priorityTasks: StudioTask[] = [
+  {
+    client: "Atlas Mobile",
+    due: "Yesterday",
+    status: "overdue",
+    title: "Send revised scope assumptions",
+  },
+  {
+    client: "Northstar Labs",
+    due: "Today, 2:00 PM",
+    status: "today",
+    title: "Prepare visual direction review",
+  },
+  {
+    client: "Cedar Commerce",
+    due: "Tomorrow",
+    status: "upcoming",
+    title: "Draft checkout experiment recap",
+  },
+  {
+    client: "Studio operations",
+    due: "Friday",
+    status: "upcoming",
+    title: "Block deep work for proposal polish",
+  },
+];
+
+export const upcomingEvents: StudioEvent[] = [
+  {
+    date: "18",
+    day: "Thu",
+    label: "Northstar review",
+    time: "2:00 PM",
+    type: "review",
+  },
+  {
+    date: "19",
+    day: "Fri",
+    label: "Atlas proposal send-off",
+    time: "10:30 AM",
+    type: "deadline",
+  },
+  {
+    date: "24",
+    day: "Wed",
+    label: "Cedar roadmap sync",
+    time: "1:00 PM",
+    type: "call",
+  },
+];
+
+export const studioNotifications: StudioNotification[] = [
+  {
+    message: "Atlas Mobile proposal has one overdue scope decision before it can be sent.",
+    meta: "Needs attention",
+    tone: "attention",
+    title: "Proposal reminder",
+  },
+  {
+    message: "Northstar Labs review is coming up today with three prepared talking points.",
+    meta: "Calendar",
+    tone: "neutral",
+    title: "Upcoming client review",
+  },
+  {
+    message: "Cedar Commerce handoff checklist is ready to reuse in the Knowledge Base.",
+    meta: "Saved",
+    tone: "success",
+    title: "Template captured",
+  },
 ];
 
 export const clients = [

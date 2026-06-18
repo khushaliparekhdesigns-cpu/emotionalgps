@@ -18,13 +18,13 @@ export function Modal({ children, description, open, title, onClose }: ModalProp
   return (
     <div
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-studio-ink/16 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-studio-ink/14 px-4 backdrop-blur-md"
       role="dialog"
     >
-      <div className="w-full max-w-lg rounded-3xl border border-studio-line bg-white p-6 shadow-[0_24px_80px_rgba(29,29,31,0.14)]">
+      <div className="w-full max-w-lg rounded-[28px] border border-studio-line/80 bg-white/92 p-6 shadow-[0_24px_80px_rgba(33,31,27,0.12)]">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold tracking-[-0.03em] text-studio-ink">
+            <h2 className="font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
               {title}
             </h2>
             {description ? (

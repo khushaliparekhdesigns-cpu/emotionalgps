@@ -6,15 +6,15 @@ import { clients } from "../data/studioData";
 
 export function ClientHub() {
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
       <Card>
         <CardBody>
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-base font-semibold tracking-[-0.02em] text-studio-ink">
+              <h2 className="font-display text-3xl leading-none tracking-[-0.02em] text-studio-ink">
                 Client workspace
               </h2>
-              <p className="mt-1 text-sm text-studio-muted">
+              <p className="mt-2 text-sm text-studio-muted">
                 A calm overview of active relationships and commitments.
               </p>
             </div>
@@ -22,7 +22,7 @@ export function ClientHub() {
               Add client
             </Button>
           </div>
-          <div className="divide-y divide-studio-line">
+          <div className="divide-y divide-studio-line/65">
             {clients.map((client) => (
               <div
                 className="grid gap-4 py-5 transition duration-200 first:pt-0 last:pb-0 sm:grid-cols-[1.2fr_0.8fr_auto]"
@@ -30,14 +30,14 @@ export function ClientHub() {
               >
                 <div>
                   <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-studio-purple-soft text-sm font-semibold text-studio-purple">
+                    <div className="grid h-10 w-10 place-items-center rounded-full bg-studio-purple-soft/76 text-sm font-semibold text-studio-purple">
                       {client.name.slice(0, 1)}
                     </div>
                     <div>
-                      <h3 className="font-semibold tracking-[-0.02em] text-studio-ink">
+                      <h3 className="font-display text-2xl leading-none tracking-[-0.02em] text-studio-ink">
                         {client.name}
                       </h3>
-                      <p className="text-sm text-studio-muted">{client.project}</p>
+                      <p className="mt-1 text-sm text-studio-muted">{client.project}</p>
                     </div>
                   </div>
                 </div>
@@ -57,18 +57,18 @@ export function ClientHub() {
         </CardBody>
       </Card>
 
-      <Card className="bg-studio-panel/80">
+      <Card className="bg-studio-warm/72">
         <CardBody>
-          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-studio-line bg-white">
+          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-studio-line/75 bg-white/70">
             <MessageSquareText aria-hidden="true" className="h-5 w-5 text-studio-purple" />
           </div>
-          <h2 className="mt-5 text-xl font-semibold tracking-[-0.04em] text-studio-ink">
+          <h2 className="mt-5 font-display text-4xl leading-none tracking-[-0.02em] text-studio-ink">
             Client memory
           </h2>
           <p className="mt-3 text-sm leading-6 text-studio-muted">
             Future integrations can attach calls, notes, decisions, and deliverables to each client profile.
           </p>
-          <div className="mt-6 rounded-2xl border border-studio-line bg-white p-4">
+          <div className="mt-6 rounded-2xl border border-studio-line/70 bg-white/58 p-4">
             <p className="text-sm font-medium text-studio-ink">Suggested next system</p>
             <p className="mt-2 text-sm leading-6 text-studio-muted">
               Add reusable client fields for decision makers, product context, contract type, and preferred communication style.
