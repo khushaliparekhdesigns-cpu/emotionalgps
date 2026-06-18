@@ -32,8 +32,9 @@ export function TopBar({ onQuickCreate }: TopBarProps) {
           <Plus aria-hidden="true" className="h-4 w-4" />
           <span className="hidden sm:inline">Quick create</span>
         </Button>
-        <Button className="h-10 w-10 rounded-xl p-0" variant="secondary">
+        <Button className="relative h-10 w-10 rounded-xl p-0" variant="secondary">
           <Bell aria-hidden="true" className="h-4 w-4" />
+          <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-studio-purple ring-2 ring-white" />
           <span className="sr-only">Notifications</span>
         </Button>
       </div>
