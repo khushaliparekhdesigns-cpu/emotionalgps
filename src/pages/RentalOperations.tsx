@@ -65,6 +65,7 @@ const statusStyles: Record<string, string> = {
   Cleaning: "border-amber-200 bg-amber-50 text-amber-700",
   Maintenance: "border-rose-200 bg-rose-50 text-rose-700",
   Delivered: "border-violet-200 bg-violet-50 text-violet-700",
+  Delivery: "border-violet-200 bg-violet-50 text-violet-700",
   Reserved: "border-studio-purple/20 bg-studio-purple-soft text-studio-purple",
   Open: "border-sky-200 bg-sky-50 text-sky-700",
   "Awaiting reply": "border-amber-200 bg-amber-50 text-amber-700",
