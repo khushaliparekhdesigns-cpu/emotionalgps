@@ -6,9 +6,9 @@ export function Logo() {
       </div>
       <div>
         <p className="text-sm font-semibold tracking-[-0.03em] text-studio-ink">
-          Aurum Drive
+          Dreamz UAE
         </p>
-        <p className="text-xs text-studio-soft">Rental operations OS</p>
+        <p className="text-xs text-studio-soft">Dubai rental operations</p>
       </div>
     </div>
   );

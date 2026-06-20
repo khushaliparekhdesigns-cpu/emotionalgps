@@ -114,7 +114,7 @@ const attentionItems: {
   },
   {
     title: "3 cars blocked by cleaning",
-    detail: "Urus, Bentayga, and G63 have pickups before 14:30.",
+    detail: "Nissan Patrol, GMC Yukon AT4, and BMW 520i have pickups before 14:30.",
     icon: ClipboardCheck,
   },
   {
@@ -124,7 +124,7 @@ const attentionItems: {
   },
   {
     title: "1 maintenance risk",
-    detail: "Range Rover SV tyre inspection may affect 17:00 handover.",
+    detail: "Range Rover Velar tyre inspection may affect 17:00 Palm Jumeirah handover.",
     icon: Wrench,
   },
 ];
@@ -714,6 +714,16 @@ function VehicleCard({
             <p className="mt-1 font-medium text-studio-ink">{vehicle.utilisation}%</p>
           </div>
         </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border border-studio-line bg-studio-panel p-3 text-sm">
+          <div>
+            <p className="text-xs text-studio-soft">Daily</p>
+            <p className="mt-1 font-semibold text-studio-ink">{formatCurrency(vehicle.dailyRate)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-studio-soft">Monthly</p>
+            <p className="mt-1 font-semibold text-studio-ink">{formatCurrency(vehicle.monthlyRate)}</p>
+          </div>
+        </div>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-studio-panel">
           <div className="h-full rounded-full bg-studio-ink" style={{ width: `${vehicle.utilisation}%` }} />
         </div>
@@ -799,6 +809,14 @@ function FleetView() {
                 <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
                   <p className="text-xs text-studio-soft">Seats</p>
                   <p className="mt-1 font-semibold text-studio-ink">{selectedVehicle.seats}</p>
+                </div>
+                <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
+                  <p className="text-xs text-studio-soft">Daily rate</p>
+                  <p className="mt-1 font-semibold text-studio-ink">{formatCurrency(selectedVehicle.dailyRate)}</p>
+                </div>
+                <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
+                  <p className="text-xs text-studio-soft">Monthly rate</p>
+                  <p className="mt-1 font-semibold text-studio-ink">{formatCurrency(selectedVehicle.monthlyRate)}</p>
                 </div>
               </div>
 
@@ -941,7 +959,7 @@ function AnalyticsView() {
       <div className="grid gap-4 md:grid-cols-4">
         <MiniMetric icon={CircleDollarSign} label="Month revenue" value={formatCurrency(312000)} helper="+9.1% month over month" />
         <MiniMetric icon={LineChart} label="Booking trend" value="119" helper="11 more bookings than May" />
-        <MiniMetric icon={Car} label="Most requested" value="G63" helper="28 requests this month" />
+        <MiniMetric icon={Car} label="Most requested" value="Nissan Patrol" helper="28 requests this month" />
         <MiniMetric icon={Clock3} label="Avg duration" value="2.8d" helper="Luxury SUV rentals average 3.4d" />
       </div>
 
@@ -966,9 +984,9 @@ function AnalyticsView() {
           </CardHeader>
           <CardBody className="space-y-4">
             {[
-              ["SUV demand", "64% of inbound enquiries mention G63, Cullinan, Urus, or Range Rover."],
-              ["Airport growth", "Heathrow and City Airport pickups are up 22% this month."],
-              ["Payment friction", "Deposit-only bookings convert 31% slower than paid bookings."],
+              ["SUV demand", "64% of inbound enquiries mention Nissan Patrol, Escalade, Yukon, or Range Rover Velar."],
+              ["Airport growth", "DXB and hotel delivery requests are up 22% this month."],
+              ["No-deposit offers", "No-deposit bookings convert faster when WhatsApp replies include requirements early."],
             ].map(([title, detail]) => (
               <div className="rounded-2xl border border-studio-line bg-studio-panel p-4" key={title}>
                 <p className="font-medium text-studio-ink">{title}</p>
@@ -1105,7 +1123,7 @@ function SettingsView() {
           icon={CreditCard}
           title="Payment settings"
           description="Deposit rules, balance reminders, refund status, and payment exceptions for high-value rentals."
-          items={["Default security deposit: GBP 5,000", "Balance due before delivery", "Finance review for rentals above GBP 12,000"]}
+          items={["Default security deposit: AED 5,000", "Balance due before delivery", "Finance review for rentals above AED 12,000"]}
         />
       </div>
 

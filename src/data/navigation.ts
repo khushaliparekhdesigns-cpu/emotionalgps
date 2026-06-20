@@ -24,7 +24,7 @@ export const routes: StudioRoute[] = [
     key: "dashboard",
     label: "Dashboard",
     path: "/",
-    description: "Live operational pulse for enquiries, fleet readiness, returns, and revenue.",
+    description: "Live Dubai operational pulse for enquiries, fleet readiness, returns, and AED revenue.",
     icon: LayoutDashboard,
   },
   {
@@ -45,7 +45,7 @@ export const routes: StudioRoute[] = [
     key: "fleet",
     label: "Fleet",
     path: "/fleet",
-    description: "Visual fleet control for availability, location, revenue, and utilisation.",
+    description: "Visual fleet control for Dreamz UAE availability, location, rates, revenue, and utilisation.",
     icon: Car,
   },
   {
@@ -66,7 +66,7 @@ export const routes: StudioRoute[] = [
     key: "documents",
     label: "Documents",
     path: "/documents",
-    description: "Driver licences, passports, agreements, deposits, and expiring files.",
+    description: "Passports, Emirates IDs, visit visas, driver licences, agreements, and deposits.",
     icon: FileText,
   },
   {

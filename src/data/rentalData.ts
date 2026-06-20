@@ -56,6 +56,8 @@ export type Vehicle = {
   image: string;
   class: string;
   seats: number;
+  dailyRate: number;
+  monthlyRate: number;
 };
 
 export type Booking = {
@@ -93,7 +95,15 @@ export type DocumentRecord = {
   id: string;
   customerId: string;
   title: string;
-  type: "Passport" | "Driving licence" | "Agreement" | "Insurance" | "Deposit";
+  type:
+    | "Passport"
+    | "Emirates ID"
+    | "Visit visa"
+    | "UAE driving licence"
+    | "International driving licence"
+    | "Agreement"
+    | "Insurance"
+    | "Deposit";
   status: "Verified" | "Needs review" | "Expiring" | "Missing";
   updatedAt: string;
 };
@@ -152,59 +162,61 @@ const customerNames = [
 ];
 
 const locations = [
-  "Mayfair",
-  "Knightsbridge",
-  "Heathrow T5",
-  "Chelsea Harbour",
-  "Canary Wharf",
-  "Marble Arch",
-  "Park Lane",
-  "Kensington",
-  "London City Airport",
-  "Marylebone",
+  "Dubai Marina",
+  "Downtown Dubai",
+  "Palm Jumeirah",
+  "Business Bay",
+  "Jumeirah Beach Residence",
+  "Dubai International Airport T3",
+  "Dubai Hills",
+  "Jumeirah Village Circle",
+  "DIFC",
+  "Al Barsha",
+  "Dubai Mall",
+  "Bluewaters Island",
 ];
 
-const vehicleModels = [
-  "Mercedes-AMG G63",
-  "Rolls-Royce Cullinan",
-  "Lamborghini Urus",
-  "Range Rover SV",
-  "Bentley Bentayga Azure",
-  "Porsche 911 Turbo S",
-  "Ferrari Roma",
-  "Aston Martin DBX707",
-  "Mercedes-Maybach S680",
-  "Bentley Continental GT",
-  "McLaren GT",
-  "Porsche Taycan Turbo S",
-  "Ferrari Portofino M",
-  "Rolls-Royce Ghost",
-  "BMW XM Label",
-  "Mercedes SL63 AMG",
-  "Audi RS Q8",
-  "Maserati MC20",
-  "Lexus LM Executive",
-  "Cadillac Escalade V",
-  "Range Rover Autobiography",
-  "Mercedes V-Class First",
-  "Bentley Flying Spur",
-  "Porsche Cayenne Turbo GT",
-  "Lamborghini Huracan Evo",
-  "Ferrari 296 GTB",
-  "Aston Martin Vantage",
-  "BMW M8 Competition",
-  "Mercedes EQS SUV",
-  "Rolls-Royce Wraith",
-  "Bentley GTC Speed",
-  "Porsche Panamera GTS",
-  "Lamborghini Revuelto",
-  "Ferrari SF90 Stradale",
-  "Mercedes S63 E Performance",
-  "Range Rover Sport SV",
-  "Aston Martin DB12",
-  "McLaren Artura",
-  "Rolls-Royce Spectre",
-  "Bentley Mulsanne",
+const vehicleOffers = [
+  { model: "2024 BMW 735i", class: "Luxury sedan", seats: 5, dailyRate: 649, monthlyRate: 13999 },
+  { model: "2024 BMW 520i", class: "Luxury sedan", seats: 5, dailyRate: 319, monthlyRate: 6999 },
+  { model: "2026 BMW 520i", class: "Luxury sedan", seats: 5, dailyRate: 319, monthlyRate: 6999 },
+  { model: "2024 Mercedes CLA 250", class: "Luxury sedan", seats: 5, dailyRate: 269, monthlyRate: 5499 },
+  { model: "2024 Mercedes A200", class: "Luxury sedan", seats: 5, dailyRate: 219, monthlyRate: 4299 },
+  { model: "2024 Audi A3", class: "Luxury sedan", seats: 5, dailyRate: 189, monthlyRate: 3999 },
+  { model: "2024 Mercedes C200", class: "Luxury sedan", seats: 5, dailyRate: 349, monthlyRate: 6999 },
+  { model: "2024 Mini Cooper Hatchback", class: "Luxury sedan", seats: 4, dailyRate: 219, monthlyRate: 4299 },
+  { model: "2024 Cadillac Escalade", class: "Luxury SUV", seats: 7, dailyRate: 749, monthlyRate: 16999 },
+  { model: "2025 Cadillac Escalade", class: "Luxury SUV", seats: 7, dailyRate: 749, monthlyRate: 16999 },
+  { model: "2025 GMC Yukon AT4", class: "Luxury SUV", seats: 7, dailyRate: 449, monthlyRate: 8999 },
+  { model: "2026 GMC Yukon AT4", class: "Luxury SUV", seats: 7, dailyRate: 449, monthlyRate: 8999 },
+  { model: "2025 Range Rover Velar", class: "Luxury SUV", seats: 5, dailyRate: 379, monthlyRate: 7999 },
+  { model: "2024 Mercedes GLE 53", class: "Luxury SUV", seats: 5, dailyRate: 599, monthlyRate: 13999 },
+  { model: "2025 Nissan Patrol", class: "Luxury SUV", seats: 7, dailyRate: 549, monthlyRate: 10999 },
+  { model: "2026 Nissan Patrol", class: "Luxury SUV", seats: 7, dailyRate: 549, monthlyRate: 10999 },
+  { model: "2024 Chevrolet Tahoe", class: "Luxury SUV", seats: 7, dailyRate: 399, monthlyRate: 7999 },
+  { model: "2025 Chevrolet Tahoe", class: "Luxury SUV", seats: 7, dailyRate: 399, monthlyRate: 7999 },
+  { model: "2024 Audi Q5", class: "Luxury SUV", seats: 5, dailyRate: 349, monthlyRate: 6999 },
+  { model: "2026 Jetour T2", class: "Luxury SUV", seats: 5, dailyRate: 299, monthlyRate: 5999 },
+  { model: "2025 BMW 420i Convertible", class: "Convertible", seats: 4, dailyRate: 399, monthlyRate: 8499 },
+  { model: "2024 Kia Carnival", class: "Family vehicle", seats: 8, dailyRate: 249, monthlyRate: 4499 },
+  { model: "2025 Kia Carnival", class: "Family vehicle", seats: 8, dailyRate: 249, monthlyRate: 4499 },
+  { model: "2024 Hyundai Stargazer", class: "Family vehicle", seats: 7, dailyRate: 129, monthlyRate: 2499 },
+  { model: "2022 Hyundai Staria", class: "Family vehicle", seats: 9, dailyRate: 229, monthlyRate: 4999 },
+  { model: "2025 Hyundai Staria", class: "Family vehicle", seats: 9, dailyRate: 229, monthlyRate: 4999 },
+  { model: "2026 Hyundai Staria", class: "Family vehicle", seats: 9, dailyRate: 229, monthlyRate: 4999 },
+  { model: "2024 Citroen Spacetourer", class: "Family vehicle", seats: 9, dailyRate: 299, monthlyRate: 5999 },
+  { model: "2024 Chevrolet Captiva", class: "Family vehicle", seats: 7, dailyRate: 109, monthlyRate: 2199 },
+  { model: "2025 Chevrolet Captiva", class: "Family vehicle", seats: 7, dailyRate: 109, monthlyRate: 2199 },
+  { model: "2026 Chevrolet Captiva", class: "Family vehicle", seats: 7, dailyRate: 109, monthlyRate: 2199 },
+  { model: "2024 Kia Sonet", class: "Economy SUV", seats: 5, dailyRate: 89, monthlyRate: 1899 },
+  { model: "2025 Suzuki Jimny", class: "Economy SUV", seats: 4, dailyRate: 129, monthlyRate: 2599 },
+  { model: "2025 Nissan Sunny", class: "Economy sedan", seats: 5, dailyRate: 79, monthlyRate: 1599 },
+  { model: "2023 Mitsubishi Attrage", class: "Economy sedan", seats: 5, dailyRate: 79, monthlyRate: 1499 },
+  { model: "2024 Kia Pegas", class: "Economy sedan", seats: 5, dailyRate: 79, monthlyRate: 1599 },
+  { model: "2022 Hyundai Sonata", class: "Economy sedan", seats: 5, dailyRate: 89, monthlyRate: 1999 },
+  { model: "2024 BMW 520i M Sport", class: "Luxury sedan", seats: 5, dailyRate: 319, monthlyRate: 6999 },
+  { model: "2025 Nissan Patrol Platinum", class: "Luxury SUV", seats: 7, dailyRate: 549, monthlyRate: 10999 },
+  { model: "2026 GMC Yukon AT4 Black Edition", class: "Luxury SUV", seats: 7, dailyRate: 449, monthlyRate: 8999 },
 ];
 
 const vehicleImages = [
@@ -227,20 +239,22 @@ const statuses: VehicleStatus[] = [
   "Reserved",
 ];
 
-export const vehicles: Vehicle[] = vehicleModels.map((model, index) => ({
+export const vehicles: Vehicle[] = vehicleOffers.map((offer, index) => ({
   id: `veh-${index + 1}`,
-  model,
-  plate: `AD${(70 + index).toString()} ${["LUX", "VIP", "GTS", "SVR", "ROM"][index % 5]}`,
+  model: offer.model,
+  plate: `${["D", "AA", "BB", "O", "P"][index % 5]} ${10000 + index * 137}`,
   status: statuses[index % statuses.length],
   location: locations[index % locations.length],
   nextBooking: `${["Today", "Tomorrow", "21 Jun", "22 Jun", "24 Jun"][index % 5]} · ${
     customerNames[(index * 3) % customerNames.length]
   }`,
-  revenue: 18000 + index * 4300 + (index % 4) * 2400,
+  revenue: offer.monthlyRate * (2 + (index % 4)) + offer.dailyRate * (8 + (index % 6)),
   utilisation: 48 + ((index * 7) % 47),
   image: vehicleImages[index % vehicleImages.length],
-  class: ["SUV", "Supercar", "Chauffeur", "Convertible", "Electric"][index % 5],
-  seats: [2, 4, 5, 7][index % 4],
+  class: offer.class,
+  seats: offer.seats,
+  dailyRate: offer.dailyRate,
+  monthlyRate: offer.monthlyRate,
 }));
 
 export const customers: Customer[] = customerNames.map((name, index) => {
@@ -254,7 +268,7 @@ export const customers: Customer[] = customerNames.map((name, index) => {
     id: `cust-${index + 1}`,
     name,
     tier,
-    phone: `+44 7${(400000000 + index * 78291).toString().slice(0, 9)}`,
+    phone: `+971 5${(20000000 + index * 78291).toString().slice(0, 8)}`,
     email: `${name.toLowerCase().replaceAll(" ", ".").replaceAll("-", "")}@example.com`,
     location: locations[index % locations.length],
     since: `20${18 + (index % 7)}`,
@@ -262,8 +276,8 @@ export const customers: Customer[] = customerNames.map((name, index) => {
     preferredVehicles,
     currentBookingId: index < 18 ? `book-${index + 1}` : undefined,
     notes: [
-      tier === "VIP" ? "Prefers direct WhatsApp updates and no deposit reminders after confirmation." : "Responds fastest before 10:00.",
-      `Usually requests ${preferredVehicles[0]} for ${index % 2 === 0 ? "airport transfers" : "weekend rentals"}.`,
+      tier === "VIP" ? "Prefers direct WhatsApp updates and hotel delivery confirmation before dispatch." : "Responds fastest before 10:00 UAE time.",
+      `Usually requests ${preferredVehicles[0]} for ${index % 2 === 0 ? "DXB airport transfers" : "weekly Dubai rentals"}.`,
     ],
     timeline: [
       {
@@ -274,7 +288,7 @@ export const customers: Customer[] = customerNames.map((name, index) => {
       {
         time: "Yesterday 16:10",
         title: "Payment activity",
-        detail: index % 4 === 0 ? "Deposit is pending finance review." : "Security deposit was pre-authorised.",
+        detail: index % 4 === 0 ? "No-deposit eligibility is pending finance review." : "Security deposit was pre-authorised in AED.",
       },
       {
         time: "Last rental",
@@ -284,13 +298,13 @@ export const customers: Customer[] = customerNames.map((name, index) => {
     ],
     uploadedDocuments: [
       { name: "Passport", status: index % 9 === 0 ? "Expiring" : "Verified" },
-      { name: "Driving licence", status: index % 8 === 0 ? "Missing" : "Verified" },
+      { name: index % 3 === 0 ? "Emirates ID" : "UAE driving licence", status: index % 8 === 0 ? "Missing" : "Verified" },
       { name: "Rental agreement", status: index % 5 === 0 ? "Expiring" : "Verified" },
     ],
     paymentHistory: [
-      { label: "June rental", amount: 2800 + index * 45, status: index % 6 === 0 ? "Pending" : "Paid" },
+      { label: "June rental", amount: 1800 + index * 95, status: index % 6 === 0 ? "Pending" : "Paid" },
       { label: "Security deposit", amount: 5000, status: "Deposit held" },
-      { label: "May rental", amount: 1900 + index * 35, status: "Paid" },
+      { label: "May rental", amount: 1400 + index * 75, status: "Paid" },
     ],
     previousBookings: [
       vehicles[(index + 4) % vehicles.length].model,
@@ -313,7 +327,7 @@ export const bookings: Booking[] = Array.from({ length: 64 }, (_, index) => ({
   status: ["Confirmed", "In progress", "Awaiting payment", "Draft", "Completed"][index % 5] as BookingStatus,
   payment: ["Paid", "Pending", "Deposit only"][index % 3] as Booking["payment"],
   driver: ["Mason", "Elliot", "Riya", "Theo", "Nadia", "Self-drive"][index % 6],
-  value: 950 + (index % 9) * 380 + index * 42,
+  value: 420 + (index % 9) * 260 + index * 35,
   view: ["Day", "Week", "Month"][index % 3] as Booking["view"],
 }));
 
@@ -351,15 +365,15 @@ export const conversations: Conversation[] = Array.from({ length: 36 }, (_, inde
       },
       {
         from: "team",
-        author: "Aurum concierge",
+        author: "Dreamz concierge",
         time: "08:48",
-        text: `Yes, we can reserve it with delivery to ${customer.location}. I can send a quote and document checklist now.`,
+        text: `Yes, we can reserve it with same-day delivery to ${customer.location}. I can send the AED quote and WhatsApp document checklist now.`,
       },
       {
         from: "customer",
         author: customer.name,
         time: "09:06",
-        text: index % 3 === 0 ? "Great. Please hold it for me and send payment details." : "Could you also include airport return pickup?",
+        text: index % 3 === 0 ? "Great. Please hold it for me and send the payment link." : "Could you also include DXB airport return pickup?",
       },
     ],
   };
@@ -369,9 +383,18 @@ export const documents: DocumentRecord[] = Array.from({ length: 42 }, (_, index)
   id: `doc-${index + 1}`,
   customerId: customers[(index * 2) % customers.length].id,
   title: `${customers[(index * 2) % customers.length].name} · ${
-    ["Passport", "Driving licence", "Rental agreement", "Insurance certificate", "Deposit receipt"][index % 5]
+    ["Passport", "Emirates ID", "Visit visa", "UAE driving licence", "Deposit receipt", "Rental agreement"][index % 6]
   }`,
-  type: ["Passport", "Driving licence", "Agreement", "Insurance", "Deposit"][index % 5] as DocumentRecord["type"],
+  type: [
+    "Passport",
+    "Emirates ID",
+    "Visit visa",
+    "UAE driving licence",
+    "International driving licence",
+    "Deposit",
+    "Agreement",
+    "Insurance",
+  ][index % 8] as DocumentRecord["type"],
   status: ["Verified", "Needs review", "Expiring", "Missing"][index % 4] as DocumentRecord["status"],
   updatedAt: `${["Today", "Yesterday", "18 Jun", "16 Jun", "12 Jun"][index % 5]} · ${
     ["09:20", "11:45", "13:10", "15:30"][index % 4]
@@ -379,26 +402,26 @@ export const documents: DocumentRecord[] = Array.from({ length: 42 }, (_, index)
 }));
 
 export const revenueByMonth = [
-  { month: "Jan", revenue: 188000, bookings: 78 },
-  { month: "Feb", revenue: 204000, bookings: 83 },
-  { month: "Mar", revenue: 232000, bookings: 91 },
-  { month: "Apr", revenue: 248000, bookings: 96 },
-  { month: "May", revenue: 286000, bookings: 108 },
-  { month: "Jun", revenue: 312000, bookings: 119 },
+  { month: "Jan", revenue: 488000, bookings: 138 },
+  { month: "Feb", revenue: 524000, bookings: 151 },
+  { month: "Mar", revenue: 612000, bookings: 176 },
+  { month: "Apr", revenue: 648000, bookings: 188 },
+  { month: "May", revenue: 706000, bookings: 214 },
+  { month: "Jun", revenue: 782000, bookings: 236 },
 ];
 
 export const operationsTimeline = [
-  { time: "09:00", title: "Deliver G63", detail: "Mayfair · Rafael Kingsley", tone: "Delivery" },
-  { time: "11:00", title: "Receive Cullinan", detail: "Knightsbridge · post-rental inspection", tone: "Return" },
-  { time: "12:00", title: "Vehicle cleaning", detail: "Urus and Bentayga for afternoon pickups", tone: "Prep" },
-  { time: "14:00", title: "Airport pickup", detail: "Heathrow T5 · Ghost with chauffeur", tone: "Transfer" },
-  { time: "17:00", title: "Return Urus", detail: "Chelsea Harbour · inspect wheels", tone: "Return" },
+  { time: "09:00", title: "Deliver Cadillac Escalade", detail: "Downtown Dubai · Rafael Kingsley", tone: "Delivery" },
+  { time: "11:00", title: "Receive BMW 735i", detail: "Dubai Marina · post-rental inspection", tone: "Return" },
+  { time: "12:00", title: "Vehicle cleaning", detail: "Nissan Patrol and GMC Yukon for afternoon pickups", tone: "Prep" },
+  { time: "14:00", title: "DXB airport pickup", detail: "Dubai International Airport T3 · Range Rover Velar", tone: "Transfer" },
+  { time: "17:00", title: "Return Mercedes GLE 53", detail: "Palm Jumeirah · inspect wheels and salik", tone: "Return" },
 ];
 
 export const aiDemoCards = [
   {
     title: "Summarize this conversation",
-    body: "Customer wants a Urus tonight, needs airport return pickup, deposit link pending.",
+    body: "Customer wants a Nissan Patrol tonight, needs DXB return pickup, payment link pending.",
   },
   {
     title: "Daily operational summary",
@@ -406,17 +429,17 @@ export const aiDemoCards = [
   },
   {
     title: "Suggested follow-up",
-    body: "Ask Noura to upload licence front/back before holding the Cullinan past 13:00.",
+    body: "Ask Noura to upload Emirates ID or visit visa before holding the Escalade past 13:00.",
   },
   {
     title: "Natural language search",
-    body: "Show available SUVs in Mayfair today with revenue above GBP 40k this month.",
+    body: "Show available SUVs in Dubai Marina today with revenue above AED 40k this month.",
   },
 ];
 
 export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-GB", {
-    currency: "GBP",
+  return new Intl.NumberFormat("en-AE", {
+    currency: "AED",
     maximumFractionDigits: 0,
     style: "currency",
   }).format(value);

@@ -34,7 +34,7 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
         title="Quick create"
       >
         <div className="space-y-4">
-          <Input label="Title" placeholder="VIP airport pickup for Monday" />
+          <Input label="Title" placeholder="DXB airport pickup for Monday" />
           <Input label="Type" placeholder="Enquiry, booking, customer note, vehicle task..." />
           <div className="rounded-2xl border border-studio-line bg-studio-panel p-4">
             <div className="flex items-center gap-2 text-sm font-medium text-studio-ink">
@@ -42,7 +42,7 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
               AI suggestion
             </div>
             <p className="mt-2 text-sm leading-6 text-studio-muted">
-              Aurum can summarize the customer thread, suggest follow-ups, or attach this note to a booking when workflows are connected.
+              Dreamz Ops can summarize the WhatsApp thread, suggest follow-ups, or attach this note to a booking when workflows are connected.
             </p>
           </div>
           <div className="flex justify-end gap-2 pt-2">
