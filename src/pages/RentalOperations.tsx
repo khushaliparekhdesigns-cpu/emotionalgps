@@ -4,13 +4,10 @@ import {
   Activity,
   AlertCircle,
   ArrowUpRight,
-  BadgeCheck,
-  BarChart3,
   Bot,
   CalendarDays,
   Car,
   CheckCircle2,
-  ChevronRight,
   CircleDollarSign,
   ClipboardCheck,
   Clock3,
@@ -21,7 +18,6 @@ import {
   KeyRound,
   LineChart,
   Mail,
-  MapPin,
   MessageCircle,
   MoreHorizontal,
   Plane,
@@ -104,6 +100,45 @@ const fleetFilters: (VehicleStatus | "All")[] = [
   "Maintenance",
   "Delivered",
   "Reserved",
+];
+
+const attentionItems: {
+  title: string;
+  detail: string;
+  icon: LucideIcon;
+}[] = [
+  {
+    title: "6 conversations need replies",
+    detail: "Prioritize VIP and payment-stage threads.",
+    icon: AlertCircle,
+  },
+  {
+    title: "3 cars blocked by cleaning",
+    detail: "Urus, Bentayga, and G63 have pickups before 14:30.",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "2 deposits pending",
+    detail: "Hold vehicles for 45 minutes unless payment lands.",
+    icon: CreditCard,
+  },
+  {
+    title: "1 maintenance risk",
+    detail: "Range Rover SV tyre inspection may affect 17:00 handover.",
+    icon: Wrench,
+  },
+];
+
+const connectedChannels: {
+  label: string;
+  status: string;
+  icon: LucideIcon;
+}[] = [
+  { label: "WhatsApp Business", status: "Connected", icon: MessageCircle },
+  { label: "Shared email", status: "Connected", icon: Mail },
+  { label: "Website enquiries", status: "Live", icon: Inbox },
+  { label: "Google Ads", status: "Importing leads", icon: Search },
+  { label: "Meta Ads", status: "Importing leads", icon: TrendingUp },
 ];
 
 function StatusPill({ value }: { value: string }) {
@@ -305,24 +340,19 @@ function DashboardView() {
             <SectionHeading eyebrow="Command center" title="What requires attention right now?" />
           </CardHeader>
           <CardBody className="space-y-4">
-            {[
-              ["6 conversations need replies", "Prioritize VIP and payment-stage threads.", AlertCircle],
-              ["3 cars blocked by cleaning", "Urus, Bentayga, and G63 have pickups before 14:30.", ClipboardCheck],
-              ["2 deposits pending", "Hold vehicles for 45 minutes unless payment lands.", CreditCard],
-              ["1 maintenance risk", "Range Rover SV tyre inspection may affect 17:00 handover.", Wrench],
-            ].map(([title, detail, Icon]) => {
-              const AttentionIcon = Icon as LucideIcon;
+            {attentionItems.map((item) => {
+              const AttentionIcon = item.icon;
               return (
                 <div
                   className="flex items-start gap-3 rounded-2xl border border-studio-line bg-white p-4 shadow-sm"
-                  key={String(title)}
+                  key={item.title}
                 >
                   <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-studio-purple-soft text-studio-purple">
                     <AttentionIcon aria-hidden="true" className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-studio-ink">{title}</p>
-                    <p className="mt-1 text-sm leading-5 text-studio-muted">{detail}</p>
+                    <p className="text-sm font-semibold text-studio-ink">{item.title}</p>
+                    <p className="mt-1 text-sm leading-5 text-studio-muted">{item.detail}</p>
                   </div>
                 </div>
               );
@@ -1084,21 +1114,15 @@ function SettingsView() {
           <SectionHeading eyebrow="Sources" title="Connected channels" />
         </CardHeader>
         <CardBody className="space-y-3">
-          {[
-            ["WhatsApp Business", "Connected", MessageCircle],
-            ["Shared email", "Connected", Mail],
-            ["Website enquiries", "Live", Inbox],
-            ["Google Ads", "Importing leads", Search],
-            ["Meta Ads", "Importing leads", TrendingUp],
-          ].map(([label, status, Icon]) => {
-            const ChannelIcon = Icon as LucideIcon;
+          {connectedChannels.map((channel) => {
+            const ChannelIcon = channel.icon;
             return (
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-studio-panel p-3" key={String(label)}>
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-studio-panel p-3" key={channel.label}>
                 <div className="flex items-center gap-3">
                   <ChannelIcon aria-hidden="true" className="h-4 w-4 text-studio-muted" />
-                  <p className="text-sm font-medium text-studio-ink">{label}</p>
+                  <p className="text-sm font-medium text-studio-ink">{channel.label}</p>
                 </div>
-                <Badge tone="success">{status}</Badge>
+                <Badge tone="success">{channel.status}</Badge>
               </div>
             );
           })}
