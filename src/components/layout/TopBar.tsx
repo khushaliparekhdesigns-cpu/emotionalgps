@@ -22,7 +22,7 @@ export function TopBar({ onQuickCreate }: TopBarProps) {
           <Input
             aria-label="Search workspace"
             className="pl-9"
-            placeholder="Search clients, briefs, notes..."
+            placeholder="Search customers, cars, plates, bookings..."
           />
           <div className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded-md border border-studio-line bg-studio-panel px-1.5 py-0.5 text-[11px] text-studio-soft lg:flex">
             <Command aria-hidden="true" className="h-3 w-3" /> K

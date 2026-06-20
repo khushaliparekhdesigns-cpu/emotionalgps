@@ -49,10 +49,10 @@ export function Sidebar({ activeRoute, onNavigate }: SidebarProps) {
 
       <div className="rounded-2xl border border-studio-line bg-white p-4 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">
-          AI workspace
+          Today requires attention
         </p>
         <p className="mt-2 text-sm leading-6 text-studio-muted">
-          Draft better scopes, keep client knowledge close, and protect your design focus.
+          6 conversations are awaiting reply, 4 returns are due, and 3 cars need cleaning before pickup.
         </p>
       </div>
     </aside>

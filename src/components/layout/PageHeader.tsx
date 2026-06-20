@@ -11,7 +11,7 @@ export function PageHeader({ actions, route }: PageHeaderProps) {
     <div className="flex flex-col gap-5 py-8 sm:flex-row sm:items-end sm:justify-between lg:py-10">
       <div className="max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">
-          StudioHQ
+          Aurum Drive OS
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.055em] text-studio-ink sm:text-4xl">
           {route.label}

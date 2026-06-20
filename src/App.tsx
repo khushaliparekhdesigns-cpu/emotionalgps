@@ -1,29 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { CalendarPlus, Sparkles } from "lucide-react";
 import { AppShell } from "./components/layout/AppShell";
 import { PageHeader } from "./components/layout/PageHeader";
 import { Button } from "./components/ui/Button";
 import { getRouteByPath } from "./data/navigation";
 import type { StudioRoute } from "./data/navigation";
-import { AIStudio } from "./pages/AIStudio";
-import { BusinessDashboard } from "./pages/BusinessDashboard";
-import { ClientHub } from "./pages/ClientHub";
-import { Dashboard } from "./pages/Dashboard";
-import { InspirationLibrary } from "./pages/InspirationLibrary";
-import { KnowledgeBase } from "./pages/KnowledgeBase";
-import { PricingCalculator } from "./pages/PricingCalculator";
-import { ProposalGenerator } from "./pages/ProposalGenerator";
-
-const pageByRoute = {
-  dashboard: <Dashboard />,
-  clients: <ClientHub />,
-  "ai-studio": <AIStudio />,
-  knowledge: <KnowledgeBase />,
-  inspiration: <InspirationLibrary />,
-  proposals: <ProposalGenerator />,
-  pricing: <PricingCalculator />,
-  business: <BusinessDashboard />,
-};
+import { RentalOperations } from "./pages/RentalOperations";
 
 function useStudioRouter() {
   const [activeRoute, setActiveRoute] = useState<StudioRoute>(() =>
@@ -53,7 +35,10 @@ function useStudioRouter() {
 
 export default function App() {
   const { activeRoute, navigate } = useStudioRouter();
-  const activePage = useMemo(() => pageByRoute[activeRoute.key], [activeRoute.key]);
+  const activePage = useMemo(
+    () => <RentalOperations routeKey={activeRoute.key} />,
+    [activeRoute.key],
+  );
 
   return (
     <AppShell activeRoute={activeRoute} onNavigate={navigate}>
@@ -61,12 +46,12 @@ export default function App() {
         actions={
           <>
             <Button variant="secondary">
-              Roadmap
-              <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+              <CalendarPlus aria-hidden="true" className="h-4 w-4" />
+              New booking
             </Button>
             <Button variant="quiet">
               <Sparkles aria-hidden="true" className="h-4 w-4" />
-              Ask AI
+              Ask ops
             </Button>
           </>
         }
