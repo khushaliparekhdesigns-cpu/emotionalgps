@@ -1529,7 +1529,7 @@ export function RentalOperations({ routeKey }: RentalOperationsProps) {
 
   return (
     <>
-      {routeKey === "dashboard" ? null : <HeroQuestionBar />}
+      <HeroQuestionBar />
       {content}
     </>
   );
