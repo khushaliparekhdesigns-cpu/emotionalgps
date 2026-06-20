@@ -102,30 +102,80 @@ const fleetFilters: (VehicleStatus | "All")[] = [
   "Reserved",
 ];
 
-const attentionItems: {
+const dashboardUrgentActions: {
   title: string;
   detail: string;
+  meta: string;
+  action: string;
+  severity: "critical" | "warning";
   icon: LucideIcon;
 }[] = [
   {
-    title: "6 conversations need replies",
-    detail: "Prioritize VIP and payment-stage threads.",
+    title: "2 overdue returns",
+    detail: "BMW 735i and Kia Carnival are past return window and need guest follow-up.",
+    meta: "Oldest overdue 42m",
+    action: "Call customer",
+    severity: "critical",
     icon: AlertCircle,
   },
   {
-    title: "3 cars blocked by cleaning",
-    detail: "Nissan Patrol, GMC Yukon AT4, and BMW 520i have pickups before 14:30.",
-    icon: ClipboardCheck,
-  },
-  {
-    title: "2 deposits pending",
-    detail: "Hold vehicles for 45 minutes unless payment lands.",
+    title: "AED 18.4k pending payments",
+    detail: "Five deposits and three balances must clear before vehicle delivery.",
+    meta: "3 pickups at risk",
+    action: "Send links",
+    severity: "warning",
     icon: CreditCard,
   },
   {
-    title: "1 maintenance risk",
-    detail: "Range Rover Velar tyre inspection may affect 17:00 Palm Jumeirah handover.",
+    title: "4 unassigned enquiries",
+    detail: "WhatsApp and Google Ads leads are waiting without an owner.",
+    meta: "Oldest waiting 1h 14m",
+    action: "Assign now",
+    severity: "critical",
+    icon: Inbox,
+  },
+  {
+    title: "3 prep delays",
+    detail: "Nissan Patrol, GMC Yukon AT4, and BMW 520i need cleaning before 14:30.",
+    meta: "Cleaning bay full",
+    action: "Prioritize prep",
+    severity: "warning",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "1 booking conflict",
+    detail: "Range Rover Velar inspection overlaps with a 17:00 Palm Jumeirah handover.",
+    meta: "Resolve by 15:30",
+    action: "Reassign car",
+    severity: "critical",
     icon: Wrench,
+  },
+];
+
+const dashboardActivityFeed = [
+  {
+    time: "09:18",
+    title: "New WhatsApp enquiry",
+    detail: "Tourist asked for Nissan Patrol availability near Dubai Marina.",
+    icon: MessageCircle,
+  },
+  {
+    time: "09:06",
+    title: "Booking confirmed",
+    detail: "Mercedes CLA 250 reserved for Downtown Dubai delivery.",
+    icon: CalendarDays,
+  },
+  {
+    time: "08:52",
+    title: "Payment received",
+    detail: "AED 5,000 deposit captured for Cadillac Escalade.",
+    icon: CreditCard,
+  },
+  {
+    time: "08:31",
+    title: "Vehicle returned",
+    detail: "Audi Q5 returned at JBR and moved to inspection.",
+    icon: KeyRound,
   },
 ];
 
@@ -285,83 +335,305 @@ function CustomerSummary({ customer }: { customer: Customer }) {
 }
 
 function DashboardView() {
-  const metrics = [
-    { icon: Inbox, label: "New enquiries today", value: "18", helper: "6 from WhatsApp, 5 paid ads" },
-    { icon: Timer, label: "Awaiting reply", value: "6", helper: "Oldest waiting 1h 14m" },
-    { icon: KeyRound, label: "Active rentals", value: "23", helper: "11 self-drive, 12 chauffeur" },
-    { icon: CheckCircle2, label: "Cars available", value: "12", helper: "7 premium SUVs ready now" },
-    { icon: Wrench, label: "Cars in service", value: "7", helper: "2 blocked for maintenance" },
-    { icon: ClipboardCheck, label: "Cars being cleaned", value: "5", helper: "3 needed before 14:00" },
-    { icon: CalendarDays, label: "Returns today", value: "9", helper: "4 require damage inspection" },
-    { icon: Wallet, label: "Revenue today", value: formatCurrency(28600), helper: "+18% vs last Saturday" },
-    { icon: CreditCard, label: "Pending payments", value: formatCurrency(18400), helper: "5 deposits, 3 balances" },
+  const availableCars = vehicles.filter((vehicle) => vehicle.status === "Available");
+  const liveFleet = vehicles
+    .filter((vehicle) =>
+      ["Available", "Booked", "Cleaning", "Maintenance", "Delivered"].includes(vehicle.status),
+    )
+    .slice(0, 10);
+  const todaysRevenue = bookings.slice(0, 12).reduce((total, booking) => total + booking.value, 0);
+  const fleetStatusCounts = [
+    { label: "Available", value: availableCars.length, tone: "bg-emerald-500" },
+    { label: "Booked", value: vehicles.filter((vehicle) => vehicle.status === "Booked").length, tone: "bg-sky-500" },
+    { label: "Cleaning", value: vehicles.filter((vehicle) => vehicle.status === "Cleaning").length, tone: "bg-amber-500" },
+    { label: "Maintenance", value: vehicles.filter((vehicle) => vehicle.status === "Maintenance").length, tone: "bg-rose-500" },
+    { label: "Delivery", value: vehicles.filter((vehicle) => vehicle.status === "Delivered").length, tone: "bg-violet-500" },
+  ];
+  const snapshotMetrics = [
+    {
+      icon: CheckCircle2,
+      label: "Cars available today",
+      value: String(availableCars.length),
+      helper: "Ready to assign now",
+    },
+    {
+      icon: CalendarDays,
+      label: "Bookings today",
+      value: "27",
+      helper: "18 confirmed, 6 in progress",
+    },
+    {
+      icon: KeyRound,
+      label: "Returns today",
+      value: "9",
+      helper: "2 overdue, 4 inspect",
+    },
+    {
+      icon: Timer,
+      label: "Deliveries today",
+      value: "14",
+      helper: "3 at risk without payment",
+    },
+    {
+      icon: Wallet,
+      label: "Revenue today",
+      value: formatCurrency(todaysRevenue),
+      helper: "+18% vs last Saturday",
+    },
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {metrics.map((metric) => (
-          <MiniMetric key={metric.label} {...metric} />
-        ))}
-      </div>
+    <div className="space-y-7">
+      <section>
+        <SectionHeading
+          action={<Badge className="border-rose-200 bg-rose-50 text-rose-700">5 actions need owner</Badge>}
+          eyebrow="Top priority"
+          title="Urgent Actions"
+        />
+        <div className="grid gap-3 xl:grid-cols-5">
+          {dashboardUrgentActions.map((item) => {
+            const ActionIcon = item.icon;
+            const critical = item.severity === "critical";
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <Card>
-          <CardHeader>
-            <SectionHeading
-              action={<Button size="sm">Open calendar</Button>}
-              eyebrow="Today"
-              title="Operations timeline"
-            />
-          </CardHeader>
-          <CardBody className="space-y-4">
-            {operationsTimeline.map((item, index) => (
-              <div className="grid grid-cols-[4rem_1fr] gap-4" key={item.time}>
-                <div className="text-sm font-semibold tabular-nums text-studio-ink">{item.time}</div>
-                <div className="relative rounded-2xl border border-studio-line bg-studio-panel p-4">
-                  {index < operationsTimeline.length - 1 ? (
-                    <div className="absolute -bottom-5 left-5 h-5 w-px bg-studio-line" />
-                  ) : null}
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <p className="font-medium tracking-[-0.02em] text-studio-ink">{item.title}</p>
-                      <p className="mt-1 text-sm text-studio-muted">{item.detail}</p>
+            return (
+              <Card
+                className={cn(
+                  "border-l-4 shadow-[0_18px_55px_rgba(29,29,31,0.05)]",
+                  critical ? "border-l-rose-500" : "border-l-amber-500",
+                )}
+                key={item.title}
+              >
+                <CardBody className="flex h-full flex-col p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div
+                      className={cn(
+                        "grid h-9 w-9 place-items-center rounded-xl",
+                        critical ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-700",
+                      )}
+                    >
+                      <ActionIcon aria-hidden="true" className="h-4 w-4" />
                     </div>
-                    <Badge>{item.tone}</Badge>
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]",
+                        critical ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700",
+                      )}
+                    >
+                      {critical ? "Now" : "Soon"}
+                    </span>
+                  </div>
+                  <p className="mt-4 text-sm font-semibold leading-5 text-studio-ink">{item.title}</p>
+                  <p className="mt-2 min-h-12 text-sm leading-5 text-studio-muted">{item.detail}</p>
+                  <div className="mt-4 flex flex-1 items-end justify-between gap-3">
+                    <p className="text-xs font-medium text-studio-soft">{item.meta}</p>
+                    <Button size="sm" variant={critical ? "primary" : "secondary"}>
+                      {item.action}
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      <section>
+        <SectionHeading eyebrow="Today" title="Today's Operations Snapshot" />
+        <div className="grid gap-4 lg:grid-cols-[1fr_420px]">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {snapshotMetrics.map((metric) => {
+              const SnapshotIcon = metric.icon;
+              return (
+                <Card key={metric.label}>
+                  <CardBody className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="grid h-9 w-9 place-items-center rounded-xl bg-studio-panel text-studio-muted ring-1 ring-studio-line">
+                        <SnapshotIcon aria-hidden="true" className="h-4 w-4" />
+                      </div>
+                      <ArrowUpRight aria-hidden="true" className="h-4 w-4 text-studio-soft" />
+                    </div>
+                    <p className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-studio-ink">{metric.value}</p>
+                    <p className="mt-1 text-sm font-semibold text-studio-ink">{metric.label}</p>
+                    <p className="mt-1 text-xs leading-5 text-studio-muted">{metric.helper}</p>
+                  </CardBody>
+                </Card>
+              );
+            })}
+          </div>
+
+          <Card>
+            <CardHeader className="py-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-studio-ink">Today's live schedule</h3>
+                <Button size="sm" variant="secondary">Open calendar</Button>
+              </div>
+            </CardHeader>
+            <CardBody className="space-y-3 p-4">
+              {operationsTimeline.slice(0, 4).map((item) => (
+                <div className="grid grid-cols-[3.5rem_1fr] gap-3" key={item.time}>
+                  <p className="text-sm font-semibold tabular-nums text-studio-ink">{item.time}</p>
+                  <div className="rounded-xl border border-studio-line bg-studio-panel px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-studio-ink">{item.title}</p>
+                      <Badge>{item.tone}</Badge>
+                    </div>
+                    <p className="mt-1 text-xs text-studio-muted">{item.detail}</p>
                   </div>
                 </div>
+              ))}
+            </CardBody>
+          </Card>
+        </div>
+      </section>
+
+      <section>
+        <SectionHeading
+          action={<Badge tone="accent">Live status</Badge>}
+          eyebrow="Fleet"
+          title="Live Fleet Status"
+        />
+        <Card>
+          <CardBody className="p-4 sm:p-5">
+            <div className="grid gap-3 md:grid-cols-5">
+              {fleetStatusCounts.map((status) => (
+                <div className="rounded-2xl border border-studio-line bg-studio-panel p-3" key={status.label}>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("h-2.5 w-2.5 rounded-full", status.tone)} />
+                    <p className="text-xs font-medium text-studio-muted">{status.label}</p>
+                  </div>
+                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-studio-ink">{status.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 overflow-hidden rounded-2xl border border-studio-line">
+              <div className="hidden grid-cols-[1.25fr_0.75fr_1fr_1.2fr] gap-4 bg-studio-panel px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft md:grid">
+                <span>Vehicle</span>
+                <span>Status</span>
+                <span>Location</span>
+                <span>Next action</span>
               </div>
-            ))}
+              <div className="divide-y divide-studio-line bg-white">
+                {liveFleet.map((vehicle, index) => {
+                  const displayStatus = vehicle.status === "Delivered" ? "Delivery" : vehicle.status;
+                  const nextAction =
+                    vehicle.status === "Available"
+                      ? `Idle ${["18m", "42m", "1h 05m", "2h 10m"][index % 4]} · assign booking`
+                      : vehicle.status === "Cleaning"
+                        ? `${["10:40", "12:20", "13:15"][index % 3]} · finish prep`
+                        : vehicle.status === "Maintenance"
+                          ? `${["11:30", "15:30", "17:00"][index % 3]} · service check`
+                          : vehicle.status === "Delivered"
+                            ? `${["10:15", "14:00", "16:45"][index % 3]} · customer handover`
+                            : vehicle.nextBooking;
+
+                  return (
+                    <div
+                      className="grid gap-3 px-4 py-3 text-sm md:grid-cols-[1.25fr_0.75fr_1fr_1.2fr] md:items-center md:gap-4"
+                      key={vehicle.id}
+                    >
+                      <div>
+                        <p className="font-semibold text-studio-ink">{vehicle.model}</p>
+                        <p className="mt-1 text-xs text-studio-soft">{vehicle.plate}</p>
+                      </div>
+                      <StatusPill value={displayStatus} />
+                      <p className="text-studio-muted">{vehicle.location}</p>
+                      <p className="font-medium text-studio-ink">{nextAction}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+        <Card>
+          <CardHeader className="py-4">
+            <SectionHeading
+              action={<Badge tone="success">Trending up</Badge>}
+              eyebrow="Secondary"
+              title="Revenue Growth"
+            />
+          </CardHeader>
+          <CardBody>
+            <div className="flex items-baseline justify-between gap-4">
+              <div>
+                <p className="text-2xl font-semibold tracking-[-0.05em] text-studio-ink">
+                  {formatCurrency(revenueByMonth.at(-1)?.revenue ?? 0)}
+                </p>
+                <p className="mt-1 text-sm text-studio-muted">June revenue to date</p>
+              </div>
+              <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                +10.8% MoM
+              </p>
+            </div>
+            <div className="mt-5 opacity-80">
+              <SparklineBars values={revenueByMonth.map((item) => item.revenue)} />
+            </div>
+            <p className="mt-4 text-sm leading-6 text-studio-muted">
+              Growth is being driven by weekly SUV rentals and stronger DXB delivery conversion. Keep payment follow-up
+              tight so today's at-risk bookings do not slip.
+            </p>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>
-            <SectionHeading eyebrow="Command center" title="What requires attention right now?" />
+          <CardHeader className="py-4">
+            <SectionHeading
+              action={<Button size="sm" variant="primary">Create booking</Button>}
+              eyebrow="Quick assign"
+              title="Available Cars Quick Panel"
+            />
           </CardHeader>
-          <CardBody className="space-y-4">
-            {attentionItems.map((item) => {
-              const AttentionIcon = item.icon;
+          <CardBody className="space-y-3">
+            {availableCars.map((vehicle, index) => (
+              <div
+                className="grid gap-3 rounded-2xl border border-studio-line bg-white p-3 shadow-sm sm:grid-cols-[1fr_0.8fr_0.55fr_auto] sm:items-center"
+                key={vehicle.id}
+              >
+                <div>
+                  <p className="text-sm font-semibold text-studio-ink">{vehicle.model}</p>
+                  <p className="mt-1 text-xs text-studio-muted">{formatCurrency(vehicle.dailyRate)}/day · {vehicle.plate}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-studio-soft">Location</p>
+                  <p className="mt-1 text-sm font-medium text-studio-ink">{vehicle.location}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-studio-soft">Idle</p>
+                  <p className="mt-1 text-sm font-medium text-studio-ink">
+                    {["18m", "42m", "1h 05m", "2h 10m", "3h 20m"][index % 5]}
+                  </p>
+                </div>
+                <Button size="sm" variant="secondary">Assign booking</Button>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+      </section>
+
+      <section>
+        <SectionHeading eyebrow="Latest" title="Activity Feed" />
+        <Card>
+          <CardBody className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {dashboardActivityFeed.map((item) => {
+              const FeedIcon = item.icon;
               return (
-                <div
-                  className="flex items-start gap-3 rounded-2xl border border-studio-line bg-white p-4 shadow-sm"
-                  key={item.title}
-                >
-                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-studio-purple-soft text-studio-purple">
-                    <AttentionIcon aria-hidden="true" className="h-4 w-4" />
+                <div className="rounded-2xl border border-studio-line bg-studio-panel p-4" key={`${item.time}-${item.title}`}>
+                  <div className="flex items-center gap-2">
+                    <FeedIcon aria-hidden="true" className="h-4 w-4 text-studio-muted" />
+                    <p className="text-xs font-semibold tabular-nums text-studio-soft">{item.time}</p>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-studio-ink">{item.title}</p>
-                    <p className="mt-1 text-sm leading-5 text-studio-muted">{item.detail}</p>
-                  </div>
+                  <p className="mt-3 text-sm font-semibold text-studio-ink">{item.title}</p>
+                  <p className="mt-1 text-sm leading-5 text-studio-muted">{item.detail}</p>
                 </div>
               );
             })}
           </CardBody>
         </Card>
-      </div>
-
-      <AiConceptStrip />
+      </section>
     </div>
   );
 }
@@ -1256,7 +1528,7 @@ export function RentalOperations({ routeKey }: RentalOperationsProps) {
 
   return (
     <>
-      <HeroQuestionBar />
+      {routeKey === "dashboard" ? null : <HeroQuestionBar />}
       {content}
     </>
   );
