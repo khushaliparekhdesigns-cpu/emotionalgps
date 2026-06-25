@@ -6,7 +6,6 @@ import {
   IconArrowUpRight as ArrowUpRight,
   IconRobot as Bot,
   IconCalendar as CalendarDays,
-  IconCar as Car,
   IconCircleCheck as CheckCircle2,
   IconCoin as CircleDollarSign,
   IconClipboardCheck as ClipboardCheck,
@@ -38,7 +37,6 @@ import { Button } from "../components/ui/Button";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import {
-  aiDemoCards,
   bookings,
   conversations,
   customers,
@@ -2409,27 +2407,6 @@ function SettingsPanel({
             </div>
           ))}
         </div>
-      </CardBody>
-    </Card>
-  );
-}
-
-function AiConceptStrip() {
-  return (
-    <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
-      <CardHeader className="bg-white">
-        <div className="flex items-center gap-2">
-          <Bot aria-hidden="true" className="h-4 w-4 text-studio-purple" />
-          <h2 className="font-semibold tracking-[-0.03em] text-[#081B33]">AI concepts, only where useful</h2>
-        </div>
-      </CardHeader>
-      <CardBody className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {aiDemoCards.map((card) => (
-          <div className="rounded-2xl border border-studio-line bg-white p-4 shadow-sm" key={card.title}>
-            <p className="text-sm font-semibold text-[#081B33]">{card.title}</p>
-            <p className="mt-2 text-sm leading-6 text-[#3F4B5D]">{card.body}</p>
-          </div>
-        ))}
       </CardBody>
     </Card>
   );
