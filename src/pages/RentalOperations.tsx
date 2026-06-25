@@ -2387,22 +2387,19 @@ function DocumentsView() {
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
-        <CardBody className="space-y-5 p-5">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+      <Card className="overflow-hidden border-white bg-white shadow-[0_18px_60px_rgba(8,27,51,0.08)]">
+        <CardBody className="space-y-4 p-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Verification vault</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.055em]">
-              Document intelligence and risk center
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-white/[0.70]">
-              Primary flow: open a WhatsApp attachment in Unified Inbox, click "Save to Documents", and the file is linked to the customer profile automatically.
-            </p>
-          </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Verification vault</p>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">
+                Live document alert center
+              </h2>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {["Review pending", "View missing docs", "Verify documents", "Upload document"].map((action, index) => (
+              {["Review pending", "View missing", "Upload document"].map((action, index) => (
                 <Button
-                  className={index === 0 ? "border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" : "border-white/[0.10] bg-white/[0.08] text-white hover:bg-white/[0.14]"}
+                  className={index === 0 ? "border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" : ""}
                   key={action}
                   size="sm"
                   variant={index === 0 ? "primary" : "secondary"}
@@ -2413,36 +2410,37 @@ function DocumentsView() {
             </div>
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-[1fr_0.8fr]">
-            <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                ["Missing documents", "4 customers missing Emirates ID", "2 missing passport · 3 missing driving license", "border-rose-300/30 bg-rose-500/10"],
-                ["Expiring documents", "5 visit visas expiring in 7 days", "2 licenses expiring this month", "border-amber-300/30 bg-amber-500/10"],
-                ["Pending verification", "8 uploaded today", "3 waiting for manual verification", "border-[#31C7B7]/30 bg-[#31C7B7]/10"],
+                ["Missing documents", "4 Emirates ID", "2 passport · 3 license", "border-rose-200 bg-rose-50 text-rose-700"],
+                ["Expiring documents", "5 visas in 7 days", "2 licenses this month", "border-amber-200 bg-amber-50 text-amber-700"],
+                ["Pending verification", "8 uploaded today", "3 manual checks", "border-sky-200 bg-sky-50 text-sky-700"],
+                ["Uploads today", String(recentUploads.length), "WhatsApp / Upload / Email", "border-[#31C7B7]/30 bg-[#E7FAF7] text-[#087A70]"],
               ].map(([title, primary, secondary, className]) => (
-                <div className={cn("rounded-2xl border p-4", className)} key={title}>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="mt-3 text-lg font-semibold tracking-[-0.03em] text-white">{primary}</p>
-                  <p className="mt-2 text-sm leading-5 text-white/[0.68]">{secondary}</p>
+                <div className={cn("rounded-2xl border p-3", className)} key={title}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-75">{title}</p>
+                  <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#081B33]">{primary}</p>
+                  <p className="mt-1 text-xs leading-5 text-studio-muted">{secondary}</p>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4">
+            <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-white">Recent uploads</p>
-                <span className="text-xs font-semibold text-[#31C7B7]">Live</span>
+                <p className="text-sm font-semibold text-[#081B33]">Recent uploads</p>
+                <span className="text-xs font-semibold text-[#087A70]">Live</span>
               </div>
-              <div className="mt-3 space-y-3">
+              <div className="mt-3 space-y-2">
                 {recentUploads.map((document) => {
                   const customer = getCustomer(document.customerId);
                   return (
-                    <div className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.06] p-3" key={document.id}>
+                    <div className="flex items-center justify-between gap-3 rounded-xl bg-white p-2.5" key={document.id}>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">{customer.name}</p>
-                        <p className="mt-1 text-xs text-white/[0.62]">{document.type} · {document.source}</p>
+                        <p className="truncate text-sm font-semibold text-[#081B33]">{customer.name}</p>
+                        <p className="mt-0.5 text-xs text-studio-muted">{document.type} · {document.source}</p>
                       </div>
-                      <p className="shrink-0 text-xs font-medium text-white/[0.62]">{document.updatedAt}</p>
+                      <p className="shrink-0 text-xs font-medium text-studio-muted">{document.updatedAt}</p>
                     </div>
                   );
                 })}
