@@ -261,18 +261,6 @@ const dashboardAssignableTasks: {
   },
 ];
 
-const connectedChannels: {
-  label: string;
-  status: string;
-  icon: AppIcon;
-}[] = [
-  { label: "WhatsApp Business", status: "Connected", icon: MessageCircle },
-  { label: "Shared email", status: "Connected", icon: Mail },
-  { label: "Website enquiries", status: "Live", icon: Inbox },
-  { label: "Google Ads", status: "Importing leads", icon: Search },
-  { label: "Meta Ads", status: "Importing leads", icon: TrendingUp },
-];
-
 const inboxQueues = [
   { label: "All", count: 36 },
   { label: "Mine", count: 8 },
@@ -2578,6 +2566,18 @@ function SettingsView() {
     ["James", "Updated Salik charge", "Yesterday 16:20", "AED 4", "AED 5"],
     ["Sofia", "Changed cleaning escalation", "18 Jun 12:05", "60 minutes", "45 minutes"],
   ];
+  const settingsChannels: {
+    label: string;
+    detail: string;
+    icon: AppIcon;
+  }[] = [
+    { label: "WhatsApp numbers", detail: "+971 50 000 0000 · +971 52 000 0000", icon: MessageCircle },
+    { label: "Meta Ads", detail: "Lead forms connected", icon: TrendingUp },
+    { label: "Google Ads", detail: "Search leads importing", icon: Search },
+    { label: "Website forms", detail: "Dreamz UAE form active", icon: Inbox },
+    { label: "Payment links", detail: "Checkout links enabled", icon: CreditCard },
+    { label: "Shared email", detail: "reservations@dreamzuae.com", icon: Mail },
+  ];
 
   return (
     <div className="space-y-6">
@@ -2722,22 +2722,15 @@ function SettingsView() {
           <SectionHeading eyebrow="Sources" title="Connected Channels" />
         </CardHeader>
         <CardBody className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {[
-            ["WhatsApp numbers", "+971 50 000 0000 · +971 52 000 0000", MessageCircle],
-            ["Meta Ads", "Lead forms connected", TrendingUp],
-            ["Google Ads", "Search leads importing", Search],
-            ["Website forms", "Dreamz UAE form active", Inbox],
-            ["Payment links", "Checkout links enabled", CreditCard],
-            ["Shared email", "reservations@dreamzuae.com", Mail],
-          ].map(([label, detail, Icon]) => {
-            const ChannelIcon = Icon as AppIcon;
+          {settingsChannels.map((channel) => {
+            const ChannelIcon = channel.icon;
             return (
-              <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-4" key={String(label)}>
+              <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-4" key={channel.label}>
                 <div className="flex items-center gap-3">
                   <ChannelIcon aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
-                  <p className="text-sm font-semibold text-[#081B33]">{label}</p>
+                  <p className="text-sm font-semibold text-[#081B33]">{channel.label}</p>
                 </div>
-                <p className="mt-2 text-sm text-studio-muted">{detail}</p>
+                <p className="mt-2 text-sm text-studio-muted">{channel.detail}</p>
                 <Badge className="mt-3" tone="success">Connected</Badge>
               </div>
             );
