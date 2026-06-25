@@ -68,6 +68,7 @@ const statusStyles: Record<string, string> = {
   Delivered: "border-violet-200 bg-violet-50 text-violet-700",
   Delivery: "border-violet-200 bg-violet-50 text-violet-700",
   Reserved: "border-studio-purple/20 bg-studio-purple-soft text-studio-purple",
+  "Service due soon": "border-amber-200 bg-amber-50 text-amber-700",
   Open: "border-sky-200 bg-sky-50 text-sky-700",
   "Awaiting reply": "border-amber-200 bg-amber-50 text-amber-700",
   Assigned: "border-studio-purple/20 bg-studio-purple-soft text-studio-purple",
@@ -102,6 +103,7 @@ const fleetFilters: (VehicleStatus | "All")[] = [
   "Maintenance",
   "Delivered",
   "Reserved",
+  "Service due soon",
 ];
 
 const dashboardUrgentActions: {
@@ -1581,6 +1583,15 @@ function VehicleCard({
           <div className="h-full rounded-full bg-studio-ink" style={{ width: `${vehicle.utilisation}%` }} />
         </div>
         <p className="mt-4 text-sm text-studio-muted">Next: {vehicle.nextBooking}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Badge tone={vehicle.bookingType === "B2B" ? "accent" : "neutral"}>{vehicle.bookingType}</Badge>
+          {vehicle.status === "Available" ? (
+            <span className="text-xs font-semibold text-emerald-700">{vehicle.idleTime}</span>
+          ) : null}
+          {vehicle.status === "Service due soon" ? (
+            <span className="text-xs font-semibold text-amber-700">{vehicle.serviceDue}</span>
+          ) : null}
+        </div>
       </div>
     </button>
   );
@@ -1592,9 +1603,40 @@ function FleetView() {
   const visibleVehicles = filter === "All" ? vehicles : vehicles.filter((vehicle) => vehicle.status === filter);
   const selectedVehicle = getVehicle(selectedVehicleId);
   const selectedBookings = bookings.filter((booking) => booking.vehicleId === selectedVehicle.id).slice(0, 4);
+  const b2bVehicles = vehicles.filter((vehicle) => vehicle.bookingType === "B2B");
+  const b2cVehicles = vehicles.filter((vehicle) => vehicle.bookingType === "B2C");
+  const availableVehicles = vehicles.filter((vehicle) => vehicle.status === "Available");
+  const inServiceCount = vehicles.filter((vehicle) =>
+    ["Maintenance", "Cleaning", "Service due soon"].includes(vehicle.status),
+  ).length;
+  const averageUtilisation = Math.round(
+    vehicles.reduce((total, vehicle) => total + vehicle.utilisation, 0) / vehicles.length,
+  );
+  const b2bRevenue = b2bVehicles.reduce((total, vehicle) => total + vehicle.revenue, 0);
+  const b2cRevenue = b2cVehicles.reduce((total, vehicle) => total + vehicle.revenue, 0);
+  const fleetSummary = [
+    ["Total fleet", vehicles.length],
+    ["Available", availableVehicles.length],
+    ["B2B active", b2bVehicles.length],
+    ["B2C active", b2cVehicles.length],
+    ["Reserved", vehicles.filter((vehicle) => vehicle.status === "Reserved").length],
+    ["In service", inServiceCount],
+    ["Utilisation", `${averageUtilisation}%`],
+  ];
 
   return (
     <div className="space-y-6">
+      <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+        <CardBody className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+          {fleetSummary.map(([label, value]) => (
+            <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={label}>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft">{label}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[#081B33]">{value}</p>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
+
       <Card>
         <CardBody className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap gap-2">
@@ -1620,7 +1662,7 @@ function FleetView() {
         </CardBody>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
           {visibleVehicles.map((vehicle) => (
             <VehicleCard
@@ -1633,6 +1675,33 @@ function FleetView() {
         </div>
 
         <div className="xl:sticky xl:top-24 xl:self-start">
+          <Card className="mb-6 border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Revenue split</h3>
+                <Badge tone="accent">This month</Badge>
+              </div>
+            </CardHeader>
+            <CardBody className="space-y-3">
+              {[
+                ["B2B revenue", b2bRevenue, b2bVehicles.length],
+                ["B2C revenue", b2cRevenue, b2cVehicles.length],
+              ].map(([label, value, count]) => (
+                <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-4" key={String(label)}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#081B33]">{label}</p>
+                      <p className="mt-1 text-xs text-studio-muted">{count} active vehicles</p>
+                    </div>
+                    <p className="text-lg font-semibold tracking-[-0.04em] text-[#081B33]">
+                      {formatCurrency(Number(value))}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </CardBody>
+          </Card>
+
           <Card className="overflow-hidden">
             <div className="h-52 bg-studio-panel">
               <img alt={selectedVehicle.model} className="h-full w-full object-cover" src={selectedVehicle.image} />
@@ -1662,6 +1731,16 @@ function FleetView() {
                 <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
                   <p className="text-xs text-studio-soft">Seats</p>
                   <p className="mt-1 font-semibold text-studio-ink">{selectedVehicle.seats}</p>
+                </div>
+                <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
+                  <p className="text-xs text-studio-soft">Booking type</p>
+                  <p className="mt-1 font-semibold text-studio-ink">{selectedVehicle.bookingType}</p>
+                </div>
+                <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
+                  <p className="text-xs text-studio-soft">Idle / service</p>
+                  <p className="mt-1 font-semibold text-studio-ink">
+                    {selectedVehicle.status === "Available" ? selectedVehicle.idleTime : selectedVehicle.serviceDue}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-studio-line bg-studio-panel p-3">
                   <p className="text-xs text-studio-soft">Daily rate</p>

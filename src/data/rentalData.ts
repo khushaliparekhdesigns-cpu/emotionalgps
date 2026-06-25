@@ -4,7 +4,8 @@ export type VehicleStatus =
   | "Cleaning"
   | "Maintenance"
   | "Delivered"
-  | "Reserved";
+  | "Reserved"
+  | "Service due soon";
 
 export type BookingStatus =
   | "Confirmed"
@@ -61,6 +62,9 @@ export type Vehicle = {
   seats: number;
   dailyRate: number;
   monthlyRate: number;
+  bookingType: "B2B" | "B2C";
+  idleTime: string;
+  serviceDue: string;
 };
 
 export type Booking = {
@@ -240,6 +244,7 @@ const statuses: VehicleStatus[] = [
   "Maintenance",
   "Delivered",
   "Reserved",
+  "Service due soon",
 ];
 
 export const vehicles: Vehicle[] = vehicleOffers.map((offer, index) => ({
@@ -248,9 +253,12 @@ export const vehicles: Vehicle[] = vehicleOffers.map((offer, index) => ({
   plate: `${["D", "AA", "BB", "O", "P"][index % 5]} ${10000 + index * 137}`,
   status: statuses[index % statuses.length],
   location: locations[index % locations.length],
-  nextBooking: `${["Today", "Tomorrow", "21 Jun", "22 Jun", "24 Jun"][index % 5]} · ${
-    customerNames[(index * 3) % customerNames.length]
-  }`,
+  nextBooking:
+    index % 4 === 0
+      ? `${["Monthly corporate lease", "Hotel partner allocation", "Executive monthly rental"][index % 3]}`
+      : `${["Today", "Tomorrow", "21 Jun", "22 Jun", "24 Jun"][index % 5]} · ${
+          customerNames[(index * 3) % customerNames.length]
+        }`,
   revenue: offer.monthlyRate * (2 + (index % 4)) + offer.dailyRate * (8 + (index % 6)),
   utilisation: 48 + ((index * 7) % 47),
   image: vehicleImages[index % vehicleImages.length],
@@ -258,6 +266,9 @@ export const vehicles: Vehicle[] = vehicleOffers.map((offer, index) => ({
   seats: offer.seats,
   dailyRate: offer.dailyRate,
   monthlyRate: offer.monthlyRate,
+  bookingType: index % 4 === 0 || index % 9 === 0 ? "B2B" : "B2C",
+  idleTime: ["Idle 18m", "Idle 4h", "Idle 2 days", "Idle 45m", "Idle 6h"][index % 5],
+  serviceDue: ["Oil due in 300km", "Tyres due in 900km", "Inspection due in 2 days", "Service clear"][index % 4],
 }));
 
 export const customers: Customer[] = customerNames.map((name, index) => {
