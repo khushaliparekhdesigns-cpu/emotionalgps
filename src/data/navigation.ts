@@ -1,14 +1,14 @@
 import {
-  BarChart3,
-  CalendarDays,
-  Car,
-  FileText,
-  Inbox,
-  LayoutDashboard,
-  Settings,
-  UsersRound,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+  IconCalendar,
+  IconCar,
+  IconChartBar,
+  IconFileText,
+  IconInbox,
+  IconLayoutDashboard,
+  IconSettings,
+  IconUsers,
+} from "@tabler/icons-react";
+import type { ComponentType } from "react";
 import type { RouteKey } from "../types";
 
 export type StudioRoute = {
@@ -16,7 +16,7 @@ export type StudioRoute = {
   label: string;
   path: string;
   description: string;
-  icon: LucideIcon;
+  icon: ComponentType<{ "aria-hidden"?: boolean; className?: string }>;
 };
 
 export const routes: StudioRoute[] = [
@@ -25,56 +25,56 @@ export const routes: StudioRoute[] = [
     label: "Dashboard",
     path: "/",
     description: "Live Dubai operational pulse for enquiries, fleet readiness, returns, and AED revenue.",
-    icon: LayoutDashboard,
+    icon: IconLayoutDashboard,
   },
   {
     key: "inbox",
     label: "Unified Inbox",
     path: "/inbox",
     description: "A shared communication hub for WhatsApp, email, web, and paid enquiries.",
-    icon: Inbox,
+    icon: IconInbox,
   },
   {
     key: "customers",
     label: "Customers",
     path: "/customers",
     description: "Every customer relationship, document, payment, and booking in one page.",
-    icon: UsersRound,
+    icon: IconUsers,
   },
   {
     key: "fleet",
     label: "Fleet",
     path: "/fleet",
     description: "Visual fleet control for Dreamz UAE availability, location, rates, revenue, and utilisation.",
-    icon: Car,
+    icon: IconCar,
   },
   {
     key: "bookings",
     label: "Bookings",
     path: "/bookings",
     description: "Calendar-style rental planning by day, week, and month.",
-    icon: CalendarDays,
+    icon: IconCalendar,
   },
   {
     key: "analytics",
     label: "Analytics",
     path: "/analytics",
     description: "Revenue, utilisation, booking trends, and customer intelligence.",
-    icon: BarChart3,
+    icon: IconChartBar,
   },
   {
     key: "documents",
     label: "Documents",
     path: "/documents",
     description: "Passports, Emirates IDs, visit visas, driver licences, agreements, and deposits.",
-    icon: FileText,
+    icon: IconFileText,
   },
   {
     key: "settings",
     label: "Settings",
     path: "/settings",
     description: "Team roles, automations, sources, payment rules, and operating preferences.",
-    icon: Settings,
+    icon: IconSettings,
   },
 ];
 

@@ -8,7 +8,7 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 
 const tones = {
   neutral: "border-studio-line bg-studio-panel text-studio-muted",
-  accent: "border-studio-purple/20 bg-studio-purple-soft text-studio-purple",
+  accent: "border-[#31C7B7]/30 bg-[#E7FAF7] text-[#087A70]",
   success: "border-emerald-200 bg-emerald-50 text-emerald-700",
 };
 

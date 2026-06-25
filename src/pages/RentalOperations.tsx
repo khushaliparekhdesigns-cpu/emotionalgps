@@ -1,39 +1,38 @@
 import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import {
-  Activity,
-  AlertCircle,
-  ArrowUpRight,
-  Bot,
-  CalendarDays,
-  Car,
-  CheckCircle2,
-  CircleDollarSign,
-  ClipboardCheck,
-  Clock3,
-  CreditCard,
-  FileText,
-  Filter,
-  Inbox,
-  KeyRound,
-  LineChart,
-  Mail,
-  MessageCircle,
-  MoreHorizontal,
-  Plane,
-  Search,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Timer,
-  TrendingUp,
-  UserRound,
-  UsersRound,
-  Wallet,
-  Wrench,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+  IconActivity as Activity,
+  IconAlertTriangle as AlertCircle,
+  IconArrowUpRight as ArrowUpRight,
+  IconRobot as Bot,
+  IconCalendar as CalendarDays,
+  IconCar as Car,
+  IconCircleCheck as CheckCircle2,
+  IconCoin as CircleDollarSign,
+  IconClipboardCheck as ClipboardCheck,
+  IconClock as Clock3,
+  IconCreditCard as CreditCard,
+  IconFileText as FileText,
+  IconFilter as Filter,
+  IconInbox as Inbox,
+  IconKey as KeyRound,
+  IconChartLine as LineChart,
+  IconMail as Mail,
+  IconBrandWhatsapp as MessageCircle,
+  IconDots as MoreHorizontal,
+  IconPlane as Plane,
+  IconSearch as Search,
+  IconSend as Send,
+  IconShieldCheck as ShieldCheck,
+  IconSparkles as Sparkles,
+  IconStar as Star,
+  IconClockHour4 as Timer,
+  IconTrendingUp as TrendingUp,
+  IconUserCircle as UserRound,
+  IconUsers as UsersRound,
+  IconWallet as Wallet,
+  IconTool as Wrench,
+} from "@tabler/icons-react";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
@@ -58,6 +57,8 @@ import { cn } from "../lib/utils";
 type RentalOperationsProps = {
   routeKey: RouteKey;
 };
+
+type AppIcon = ComponentType<{ "aria-hidden"?: boolean; className?: string }>;
 
 const statusStyles: Record<string, string> = {
   Available: "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -85,7 +86,7 @@ const statusStyles: Record<string, string> = {
   Missing: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
-const sourceIcons: Record<Conversation["source"], LucideIcon> = {
+const sourceIcons: Record<Conversation["source"], AppIcon> = {
   Email: Mail,
   "Google Ads": Search,
   "Meta Ads": TrendingUp,
@@ -109,7 +110,7 @@ const dashboardUrgentActions: {
   meta: string;
   action: string;
   severity: "critical" | "warning";
-  icon: LucideIcon;
+  icon: AppIcon;
 }[] = [
   {
     title: "2 overdue returns",
@@ -180,10 +181,42 @@ const dashboardActivityFeed = [
   },
 ];
 
+const dashboardTasks: {
+  title: string;
+  assignedTo: string;
+  due: string;
+  priority: "High" | "Medium" | "Low";
+}[] = [
+  {
+    title: "Verify Emirates ID for Escalade delivery",
+    assignedTo: "Sofia",
+    due: "10:30",
+    priority: "High",
+  },
+  {
+    title: "Move BMW 520i to Dubai Marina",
+    assignedTo: "Omar",
+    due: "11:15",
+    priority: "Medium",
+  },
+  {
+    title: "Confirm no-deposit eligibility",
+    assignedTo: "Amelia",
+    due: "12:00",
+    priority: "High",
+  },
+  {
+    title: "Upload signed agreement for Tahoe",
+    assignedTo: "Noah",
+    due: "14:00",
+    priority: "Low",
+  },
+];
+
 const connectedChannels: {
   label: string;
   status: string;
-  icon: LucideIcon;
+  icon: AppIcon;
 }[] = [
   { label: "WhatsApp Business", status: "Connected", icon: MessageCircle },
   { label: "Shared email", status: "Connected", icon: Mail },
@@ -211,7 +244,7 @@ function MiniMetric({
   value,
   helper,
 }: {
-  icon: LucideIcon;
+  icon: AppIcon;
   label: string;
   value: string;
   helper: string;
@@ -343,6 +376,9 @@ function DashboardView() {
     )
     .slice(0, 10);
   const todaysRevenue = bookings.slice(0, 12).reduce((total, booking) => total + booking.value, 0);
+  const carsInService =
+    vehicles.filter((vehicle) => vehicle.status === "Cleaning").length +
+    vehicles.filter((vehicle) => vehicle.status === "Maintenance").length;
   const fleetStatusCounts = [
     { label: "Available", value: availableCars.length, tone: "bg-emerald-500" },
     { label: "Booked", value: vehicles.filter((vehicle) => vehicle.status === "Booked").length, tone: "bg-sky-500" },
@@ -353,282 +389,376 @@ function DashboardView() {
   const snapshotMetrics = [
     {
       icon: CheckCircle2,
-      label: "Cars available today",
+      label: "Cars Available Today",
       value: String(availableCars.length),
-      helper: "Ready to assign now",
+      helper: "Ready now across Dubai",
+      tone: "from-emerald-50 to-white text-emerald-700",
     },
     {
       icon: CalendarDays,
-      label: "Bookings today",
+      label: "Bookings Today",
       value: "27",
       helper: "18 confirmed, 6 in progress",
+      tone: "from-sky-50 to-white text-sky-700",
     },
     {
       icon: KeyRound,
-      label: "Returns today",
+      label: "Returns Today",
       value: "9",
       helper: "2 overdue, 4 inspect",
+      tone: "from-amber-50 to-white text-amber-700",
     },
     {
-      icon: Timer,
-      label: "Deliveries today",
-      value: "14",
-      helper: "3 at risk without payment",
+      icon: Wrench,
+      label: "Cars In Service",
+      value: String(carsInService),
+      helper: "Cleaning or maintenance",
+      tone: "from-rose-50 to-white text-rose-700",
     },
     {
-      icon: Wallet,
-      label: "Revenue today",
-      value: formatCurrency(todaysRevenue),
-      helper: "+18% vs last Saturday",
+      icon: AlertCircle,
+      label: "Urgent Actions",
+      value: String(dashboardUrgentActions.length),
+      helper: "Needs owner today",
+      tone: "from-red-50 to-white text-red-700",
     },
   ];
 
   return (
-    <div className="space-y-7">
-      <section>
-        <SectionHeading
-          action={<Badge className="border-rose-200 bg-rose-50 text-rose-700">5 actions need owner</Badge>}
-          eyebrow="Top priority"
-          title="Urgent Actions"
-        />
-        <div className="grid gap-3 xl:grid-cols-5">
-          {dashboardUrgentActions.map((item) => {
+    <div className="space-y-6">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        {snapshotMetrics.map((metric) => {
+          const SnapshotIcon = metric.icon;
+          return (
+            <Card
+              className="overflow-hidden border-white bg-white shadow-[0_14px_45px_rgba(8,27,51,0.07)]"
+              key={metric.label}
+            >
+              <CardBody className={cn("bg-gradient-to-br p-5", metric.tone)}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-studio-muted">
+                      {metric.label}
+                    </p>
+                    <p className="mt-3 text-4xl font-semibold tracking-[-0.07em] text-[#081B33]">
+                      {metric.value}
+                    </p>
+                  </div>
+                  <div className="grid h-11 w-11 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+                    <SnapshotIcon aria-hidden="true" className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="mt-4 text-sm font-medium text-studio-muted">{metric.helper}</p>
+              </CardBody>
+            </Card>
+          );
+        })}
+      </section>
+
+      <section className="rounded-[22px] border border-[#F4C7C7] bg-gradient-to-br from-[#FFF7F7] via-white to-[#FFF9EF] p-4 shadow-[0_24px_80px_rgba(127,29,29,0.09)] sm:p-5">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">
+              Highest priority
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-[-0.055em] text-[#081B33]">
+              Urgent Actions
+            </h2>
+            <p className="mt-1 text-sm text-studio-muted">
+              Resolve these before deliveries start slipping.
+            </p>
+          </div>
+          <Badge className="border-rose-200 bg-rose-50 px-3 py-1.5 text-rose-700">
+            5 actions need owner
+          </Badge>
+        </div>
+        <div className="grid gap-3 xl:grid-cols-12">
+          {dashboardUrgentActions.map((item, index) => {
             const ActionIcon = item.icon;
             const critical = item.severity === "critical";
 
             return (
-              <Card
+              <div
                 className={cn(
-                  "border-l-4 shadow-[0_18px_55px_rgba(29,29,31,0.05)]",
-                  critical ? "border-l-rose-500" : "border-l-amber-500",
+                  "rounded-2xl border bg-white p-4 shadow-[0_16px_50px_rgba(8,27,51,0.07)]",
+                  critical ? "border-rose-200" : "border-amber-200",
+                  index < 2 ? "xl:col-span-3" : "xl:col-span-2",
                 )}
                 key={item.title}
               >
-                <CardBody className="flex h-full flex-col p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div
-                      className={cn(
-                        "grid h-9 w-9 place-items-center rounded-xl",
-                        critical ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-700",
-                      )}
-                    >
-                      <ActionIcon aria-hidden="true" className="h-4 w-4" />
-                    </div>
-                    <span
-                      className={cn(
-                        "rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]",
-                        critical ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700",
-                      )}
-                    >
-                      {critical ? "Now" : "Soon"}
-                    </span>
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className={cn(
+                      "grid h-11 w-11 place-items-center rounded-2xl",
+                      critical ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-700",
+                    )}
+                  >
+                    <ActionIcon aria-hidden="true" className="h-5 w-5" />
                   </div>
-                  <p className="mt-4 text-sm font-semibold leading-5 text-studio-ink">{item.title}</p>
-                  <p className="mt-2 min-h-12 text-sm leading-5 text-studio-muted">{item.detail}</p>
-                  <div className="mt-4 flex flex-1 items-end justify-between gap-3">
-                    <p className="text-xs font-medium text-studio-soft">{item.meta}</p>
-                    <Button size="sm" variant={critical ? "primary" : "secondary"}>
-                      {item.action}
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]",
+                      critical ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700",
+                    )}
+                  >
+                    {critical ? "Urgent" : "Warning"}
+                  </span>
+                </div>
+                <p className="mt-4 text-base font-semibold leading-6 text-[#081B33]">{item.title}</p>
+                <p className="mt-2 text-sm leading-5 text-studio-muted">{item.detail}</p>
+                <div className="mt-5 flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold text-studio-soft">{item.meta}</p>
+                  <Button
+                    className={critical ? "border-rose-600 bg-rose-600 text-white hover:bg-rose-700" : ""}
+                    size="sm"
+                    variant={critical ? "primary" : "secondary"}
+                  >
+                    {item.action}
+                  </Button>
+                </div>
+              </div>
             );
           })}
         </div>
       </section>
 
-      <section>
-        <SectionHeading eyebrow="Today" title="Today's Operations Snapshot" />
-        <div className="grid gap-4 lg:grid-cols-[1fr_420px]">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-            {snapshotMetrics.map((metric) => {
-              const SnapshotIcon = metric.icon;
-              return (
-                <Card key={metric.label}>
-                  <CardBody className="p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="grid h-9 w-9 place-items-center rounded-xl bg-studio-panel text-studio-muted ring-1 ring-studio-line">
-                        <SnapshotIcon aria-hidden="true" className="h-4 w-4" />
-                      </div>
-                      <ArrowUpRight aria-hidden="true" className="h-4 w-4 text-studio-soft" />
-                    </div>
-                    <p className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-studio-ink">{metric.value}</p>
-                    <p className="mt-1 text-sm font-semibold text-studio-ink">{metric.label}</p>
-                    <p className="mt-1 text-xs leading-5 text-studio-muted">{metric.helper}</p>
-                  </CardBody>
-                </Card>
-              );
-            })}
-          </div>
-
-          <Card>
-            <CardHeader className="py-3">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-studio-ink">Today's live schedule</h3>
-                <Button size="sm" variant="secondary">Open calendar</Button>
+      <section className="grid gap-5 xl:grid-cols-[1fr_390px]">
+        <Card className="overflow-hidden border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+          <CardHeader className="border-[#DDE6EF] bg-[#081B33] py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Live operations</p>
+                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-white">Today's Live Operations</h2>
               </div>
-            </CardHeader>
-            <CardBody className="space-y-3 p-4">
-              {operationsTimeline.slice(0, 4).map((item) => (
-                <div className="grid grid-cols-[3.5rem_1fr] gap-3" key={item.time}>
-                  <p className="text-sm font-semibold tabular-nums text-studio-ink">{item.time}</p>
-                  <div className="rounded-xl border border-studio-line bg-studio-panel px-3 py-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-studio-ink">{item.title}</p>
-                      <Badge>{item.tone}</Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-studio-muted">{item.detail}</p>
-                  </div>
-                </div>
-              ))}
-            </CardBody>
-          </Card>
-        </div>
-      </section>
-
-      <section>
-        <SectionHeading
-          action={<Badge tone="accent">Live status</Badge>}
-          eyebrow="Fleet"
-          title="Live Fleet Status"
-        />
-        <Card>
-          <CardBody className="p-4 sm:p-5">
-            <div className="grid gap-3 md:grid-cols-5">
-              {fleetStatusCounts.map((status) => (
-                <div className="rounded-2xl border border-studio-line bg-studio-panel p-3" key={status.label}>
-                  <div className="flex items-center gap-2">
-                    <span className={cn("h-2.5 w-2.5 rounded-full", status.tone)} />
-                    <p className="text-xs font-medium text-studio-muted">{status.label}</p>
-                  </div>
-                  <p className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-studio-ink">{status.value}</p>
-                </div>
-              ))}
+              <Button className="border-white/[0.10] bg-white/[0.10] text-white hover:bg-white/[0.15]" size="sm" variant="secondary">
+                Open calendar
+              </Button>
             </div>
-
-            <div className="mt-5 overflow-hidden rounded-2xl border border-studio-line">
-              <div className="hidden grid-cols-[1.25fr_0.75fr_1fr_1.2fr] gap-4 bg-studio-panel px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft md:grid">
-                <span>Vehicle</span>
-                <span>Status</span>
-                <span>Location</span>
-                <span>Next action</span>
-              </div>
-              <div className="divide-y divide-studio-line bg-white">
-                {liveFleet.map((vehicle, index) => {
-                  const displayStatus = vehicle.status === "Delivered" ? "Delivery" : vehicle.status;
-                  const nextAction =
-                    vehicle.status === "Available"
-                      ? `Idle ${["18m", "42m", "1h 05m", "2h 10m"][index % 4]} · assign booking`
-                      : vehicle.status === "Cleaning"
-                        ? `${["10:40", "12:20", "13:15"][index % 3]} · finish prep`
-                        : vehicle.status === "Maintenance"
-                          ? `${["11:30", "15:30", "17:00"][index % 3]} · service check`
-                          : vehicle.status === "Delivered"
-                            ? `${["10:15", "14:00", "16:45"][index % 3]} · customer handover`
-                            : vehicle.nextBooking;
-
-                  return (
-                    <div
-                      className="grid gap-3 px-4 py-3 text-sm md:grid-cols-[1.25fr_0.75fr_1fr_1.2fr] md:items-center md:gap-4"
-                      key={vehicle.id}
-                    >
-                      <div>
-                        <p className="font-semibold text-studio-ink">{vehicle.model}</p>
-                        <p className="mt-1 text-xs text-studio-soft">{vehicle.plate}</p>
-                      </div>
-                      <StatusPill value={displayStatus} />
-                      <p className="text-studio-muted">{vehicle.location}</p>
-                      <p className="font-medium text-studio-ink">{nextAction}</p>
+          </CardHeader>
+          <CardBody className="space-y-3 bg-white p-4">
+            {operationsTimeline.map((item, index) => (
+              <div className="grid grid-cols-[4rem_1fr] gap-4" key={item.time}>
+                <div>
+                  <p className="text-sm font-semibold tabular-nums text-[#081B33]">{item.time}</p>
+                  <div className="mx-auto mt-2 h-full w-px bg-studio-line" />
+                </div>
+                <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <span className={cn("h-2.5 w-2.5 rounded-full", fleetStatusCounts[index % fleetStatusCounts.length].tone)} />
+                      <p className="text-sm font-semibold text-[#081B33]">{item.title}</p>
                     </div>
-                  );
-                })}
+                    <Badge>{item.tone}</Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-studio-muted">{item.detail}</p>
+                </div>
               </div>
-            </div>
+            ))}
           </CardBody>
         </Card>
-      </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-        <Card>
+        <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
           <CardHeader className="py-4">
-            <SectionHeading
-              action={<Badge tone="success">Trending up</Badge>}
-              eyebrow="Secondary"
-              title="Revenue Growth"
-            />
-          </CardHeader>
-          <CardBody>
-            <div className="flex items-baseline justify-between gap-4">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-2xl font-semibold tracking-[-0.05em] text-studio-ink">
-                  {formatCurrency(revenueByMonth.at(-1)?.revenue ?? 0)}
-                </p>
-                <p className="mt-1 text-sm text-studio-muted">June revenue to date</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Secondary</p>
+                <h2 className="mt-1 text-lg font-semibold tracking-[-0.04em] text-[#081B33]">Revenue Growth</h2>
               </div>
-              <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                +10.8% MoM
-              </p>
+              <Badge tone="success">+10.8% MoM</Badge>
             </div>
-            <div className="mt-5 opacity-80">
+          </CardHeader>
+          <CardBody className="pt-0">
+            <p className="text-3xl font-semibold tracking-[-0.06em] text-[#081B33]">
+              {formatCurrency(revenueByMonth.at(-1)?.revenue ?? 0)}
+            </p>
+            <p className="mt-1 text-sm text-studio-muted">June revenue to date</p>
+            <div className="mt-5 h-20 opacity-70">
               <SparklineBars values={revenueByMonth.map((item) => item.revenue)} />
             </div>
             <p className="mt-4 text-sm leading-6 text-studio-muted">
-              Growth is being driven by weekly SUV rentals and stronger DXB delivery conversion. Keep payment follow-up
-              tight so today's at-risk bookings do not slip.
+              Trend is up, but today's payment blockers are the main risk to conversion.
             </p>
           </CardBody>
         </Card>
+      </section>
 
-        <Card>
+      <section className="grid gap-5 xl:grid-cols-[1fr_360px]">
+        <Card className="overflow-hidden border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
           <CardHeader className="py-4">
-            <SectionHeading
-              action={<Button size="sm" variant="primary">Create booking</Button>}
-              eyebrow="Quick assign"
-              title="Available Cars Quick Panel"
-            />
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Fleet</p>
+                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Fleet Status Table</h2>
+              </div>
+              <div className="hidden gap-2 md:flex">
+                {fleetStatusCounts.map((status) => (
+                  <div className="flex items-center gap-1.5 rounded-full bg-studio-panel px-2.5 py-1" key={status.label}>
+                    <span className={cn("h-2 w-2 rounded-full", status.tone)} />
+                    <span className="text-xs font-medium text-studio-muted">{status.value} {status.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </CardHeader>
-          <CardBody className="space-y-3">
+          <CardBody className="p-0">
+            <div className="hidden grid-cols-[1.1fr_0.65fr_0.85fr_1fr_1.1fr_0.75fr] gap-3 border-y border-studio-line bg-[#F8FAFC] px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft lg:grid">
+              <span>Vehicle</span>
+              <span>Status</span>
+              <span>Location</span>
+              <span>Next booking</span>
+              <span>Next action</span>
+              <span>Assigned staff</span>
+            </div>
+            <div className="divide-y divide-studio-line bg-white">
+              {liveFleet.map((vehicle, index) => {
+                const displayStatus = vehicle.status === "Delivered" ? "Delivery" : vehicle.status;
+                const nextAction =
+                  vehicle.status === "Available"
+                    ? `Idle ${["18m", "42m", "1h 05m", "2h 10m"][index % 4]}`
+                    : vehicle.status === "Cleaning"
+                      ? `${["10:40", "12:20", "13:15"][index % 3]} · finish prep`
+                      : vehicle.status === "Maintenance"
+                        ? `${["11:30", "15:30", "17:00"][index % 3]} · service check`
+                        : vehicle.status === "Delivered"
+                          ? `${["10:15", "14:00", "16:45"][index % 3]} · customer handover`
+                          : "Confirm docs and payment";
+
+                return (
+                  <div
+                    className="grid gap-3 px-4 py-3 text-sm lg:grid-cols-[1.1fr_0.65fr_0.85fr_1fr_1.1fr_0.75fr] lg:items-center"
+                    key={vehicle.id}
+                  >
+                    <div>
+                      <p className="font-semibold text-[#081B33]">{vehicle.model}</p>
+                      <p className="mt-0.5 text-xs text-studio-soft">{vehicle.plate}</p>
+                    </div>
+                    <StatusPill value={displayStatus} />
+                    <p className="font-medium text-studio-muted">{vehicle.location}</p>
+                    <p className="text-studio-muted">{vehicle.nextBooking}</p>
+                    <p className="font-semibold text-[#081B33]">{nextAction}</p>
+                    <p className="text-studio-muted">{["Amelia", "Omar", "Sofia", "Noah", "Riya"][index % 5]}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+          <CardHeader className="py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Team workload</p>
+            <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Tasks Panel</h2>
+          </CardHeader>
+          <CardBody className="space-y-3 pt-0">
+            {dashboardTasks.map((task) => {
+              const priorityClass =
+                task.priority === "High"
+                  ? "bg-rose-50 text-rose-700"
+                  : task.priority === "Medium"
+                    ? "bg-amber-50 text-amber-700"
+                    : "bg-emerald-50 text-emerald-700";
+
+              return (
+                <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={task.title}>
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-sm font-semibold leading-5 text-[#081B33]">{task.title}</p>
+                    <span className={cn("rounded-full px-2 py-1 text-[11px] font-semibold", priorityClass)}>
+                      {task.priority}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs text-studio-muted">
+                    <span>{task.assignedTo}</span>
+                    <span>Due {task.due}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </CardBody>
+        </Card>
+      </section>
+
+      <section className="grid gap-5 xl:grid-cols-[1fr_330px]">
+        <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+          <CardHeader className="py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Utility</p>
+                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Available Cars Quick Assign</h2>
+              </div>
+              <Button size="sm" variant="primary">Create booking</Button>
+            </div>
+          </CardHeader>
+          <CardBody className="grid gap-3 pt-0 lg:grid-cols-2">
             {availableCars.map((vehicle, index) => (
               <div
-                className="grid gap-3 rounded-2xl border border-studio-line bg-white p-3 shadow-sm sm:grid-cols-[1fr_0.8fr_0.55fr_auto] sm:items-center"
+                className="grid gap-3 rounded-2xl border border-studio-line bg-white p-3 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center"
                 key={vehicle.id}
               >
                 <div>
-                  <p className="text-sm font-semibold text-studio-ink">{vehicle.model}</p>
-                  <p className="mt-1 text-xs text-studio-muted">{formatCurrency(vehicle.dailyRate)}/day · {vehicle.plate}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-studio-soft">Location</p>
-                  <p className="mt-1 text-sm font-medium text-studio-ink">{vehicle.location}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-studio-soft">Idle</p>
-                  <p className="mt-1 text-sm font-medium text-studio-ink">
-                    {["18m", "42m", "1h 05m", "2h 10m", "3h 20m"][index % 5]}
+                  <p className="text-sm font-semibold text-[#081B33]">{vehicle.model}</p>
+                  <p className="mt-1 text-xs text-studio-muted">
+                    {formatCurrency(vehicle.dailyRate)}/day · {vehicle.plate}
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
+                      Idle {["18m", "42m", "1h 05m", "2h 10m", "3h 20m"][index % 5]}
+                    </span>
+                    <span className="rounded-full bg-studio-panel px-2.5 py-1 font-medium text-studio-muted">
+                      Near {vehicle.location}
+                    </span>
+                  </div>
                 </div>
                 <Button size="sm" variant="secondary">Assign booking</Button>
               </div>
             ))}
           </CardBody>
         </Card>
+
+        <Card className="border-white bg-[#081B33] text-white shadow-[0_18px_60px_rgba(8,27,51,0.12)]">
+          <CardBody className="p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Payments & docs</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-[-0.04em]">Blocking handovers</h2>
+            <div className="mt-5 space-y-3">
+              {[
+                ["5", "Deposits pending", "Send payment links"],
+                ["3", "Missing documents", "Request Emirates ID"],
+                ["2", "Agreements unsigned", "Send e-sign link"],
+              ].map(([value, label, action]) => (
+                <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-3" key={label}>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-2xl font-semibold tracking-[-0.05em]">{value}</p>
+                    <span className="rounded-full bg-[#31C7B7]/15 px-2.5 py-1 text-xs font-semibold text-[#31C7B7]">
+                      {action}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-white/[0.62]">{label}</p>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
       </section>
 
       <section>
-        <SectionHeading eyebrow="Latest" title="Activity Feed" />
-        <Card>
-          <CardBody className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Latest</p>
+            <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Activity Feed</h2>
+          </div>
+          <p className="text-sm text-studio-muted">Compact operational log</p>
+        </div>
+        <Card className="border-white shadow-[0_14px_45px_rgba(8,27,51,0.05)]">
+          <CardBody className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-4">
             {dashboardActivityFeed.map((item) => {
               const FeedIcon = item.icon;
               return (
-                <div className="rounded-2xl border border-studio-line bg-studio-panel p-4" key={`${item.time}-${item.title}`}>
+                <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={`${item.time}-${item.title}`}>
                   <div className="flex items-center gap-2">
-                    <FeedIcon aria-hidden="true" className="h-4 w-4 text-studio-muted" />
+                    <FeedIcon aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
                     <p className="text-xs font-semibold tabular-nums text-studio-soft">{item.time}</p>
                   </div>
-                  <p className="mt-3 text-sm font-semibold text-studio-ink">{item.title}</p>
-                  <p className="mt-1 text-sm leading-5 text-studio-muted">{item.detail}</p>
+                  <p className="mt-2 text-sm font-semibold text-[#081B33]">{item.title}</p>
+                  <p className="mt-1 text-xs leading-5 text-studio-muted">{item.detail}</p>
                 </div>
               );
             })}
@@ -1430,7 +1560,7 @@ function SettingsPanel({
   title,
 }: {
   description: string;
-  icon: LucideIcon;
+  icon: AppIcon;
   items: string[];
   title: string;
 }) {
@@ -1481,20 +1611,20 @@ function AiConceptStrip() {
 
 function HeroQuestionBar() {
   return (
-    <Card className="mb-6 overflow-hidden">
+    <Card className="mb-6 overflow-hidden border-white/[0.10] bg-[#081B33] shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
       <CardBody className="relative p-5 sm:p-6">
-        <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-gradient-to-l from-studio-purple-soft to-transparent md:block" />
+        <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-gradient-to-l from-[#31C7B7]/20 to-transparent md:block" />
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-sm font-semibold text-studio-ink">
-              <Plane aria-hidden="true" className="h-4 w-4 text-studio-purple" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-white">
+              <Plane aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
               Ask the operation anything
             </div>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-studio-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/[0.62]">
               Try: "Which SUVs are available today?", "Who has not replied to VIP customers?", or "Where is every delivered vehicle?"
             </p>
           </div>
-          <Button variant="quiet">
+          <Button className="border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" variant="primary">
             <Sparkles aria-hidden="true" className="h-4 w-4" />
             Demo search
           </Button>

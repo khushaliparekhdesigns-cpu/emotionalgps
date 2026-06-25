@@ -12,13 +12,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "border-studio-purple bg-studio-purple text-white shadow-sm shadow-studio-purple/20 hover:bg-[#695bdd]",
+    "border-[#31C7B7] bg-[#31C7B7] text-[#061B33] shadow-sm shadow-[#31C7B7]/20 hover:bg-[#28b5a7]",
   secondary:
     "border-studio-line bg-white text-studio-ink shadow-sm hover:border-studio-soft/60 hover:bg-studio-panel",
   ghost:
     "border-transparent bg-transparent text-studio-muted hover:bg-white/70 hover:text-studio-ink",
   quiet:
-    "border-transparent bg-studio-purple-soft text-studio-purple hover:bg-[#e9e5ff]",
+    "border-transparent bg-[#E7FAF7] text-[#087A70] hover:bg-[#D7F5F1]",
 };
 
 const sizes: Record<ButtonSize, string> = {

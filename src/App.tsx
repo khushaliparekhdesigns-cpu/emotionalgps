@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarPlus, Sparkles } from "lucide-react";
+import { IconCalendarPlus, IconSparkles } from "@tabler/icons-react";
 import { AppShell } from "./components/layout/AppShell";
 import { PageHeader } from "./components/layout/PageHeader";
 import { Button } from "./components/ui/Button";
@@ -46,11 +46,11 @@ export default function App() {
         actions={
           <>
             <Button variant="secondary">
-              <CalendarPlus aria-hidden="true" className="h-4 w-4" />
+              <IconCalendarPlus aria-hidden="true" className="h-4 w-4" />
               New booking
             </Button>
             <Button variant="quiet">
-              <Sparkles aria-hidden="true" className="h-4 w-4" />
+              <IconSparkles aria-hidden="true" className="h-4 w-4" />
               Ask ops
             </Button>
           </>

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { IconSparkles } from "@tabler/icons-react";
 import type { StudioRoute } from "../../data/navigation";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -38,7 +38,7 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
           <Input label="Type" placeholder="Enquiry, booking, customer note, vehicle task..." />
           <div className="rounded-2xl border border-studio-line bg-studio-panel p-4">
             <div className="flex items-center gap-2 text-sm font-medium text-studio-ink">
-              <Sparkles aria-hidden="true" className="h-4 w-4 text-studio-purple" />
+              <IconSparkles aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
               AI suggestion
             </div>
             <p className="mt-2 text-sm leading-6 text-studio-muted">
