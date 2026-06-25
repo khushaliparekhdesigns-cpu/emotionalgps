@@ -1135,7 +1135,6 @@ function InboxView() {
           </Card>
         </div>
       </div>
-    </div>
   );
 }
 
