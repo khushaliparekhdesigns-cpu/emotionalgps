@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { X } from "lucide-react";
+import { IconX } from "@tabler/icons-react";
 import { Button } from "./Button";
 
 type ModalProps = {
@@ -40,7 +40,7 @@ export function Modal({ children, description, open, title, onClose }: ModalProp
             size="sm"
             variant="ghost"
           >
-            <X aria-hidden="true" className="h-4 w-4" />
+            <IconX aria-hidden="true" className="h-4 w-4" />
           </Button>
         </div>
         {children}

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { IconSparkles } from "@tabler/icons-react";
 import type { StudioRoute } from "../../data/navigation";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -28,21 +28,21 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
       </main>
 
       <Modal
-        description="Capture a client, note, proposal idea, or AI task without leaving your current workspace."
+        description="Capture an enquiry, booking task, customer note, or fleet update without leaving your current workspace."
         onClose={() => setQuickCreateOpen(false)}
         open={quickCreateOpen}
         title="Quick create"
       >
         <div className="space-y-4">
-          <Input label="Title" placeholder="Atlas Mobile proposal update" />
-          <Input label="Type" placeholder="Client note, proposal, inspiration..." />
+          <Input label="Title" placeholder="DXB airport pickup for Monday" />
+          <Input label="Type" placeholder="Enquiry, booking, customer note, vehicle task..." />
           <div className="rounded-2xl border border-studio-line bg-studio-panel p-4">
             <div className="flex items-center gap-2 text-sm font-medium text-studio-ink">
-              <Sparkles aria-hidden="true" className="h-4 w-4 text-studio-purple" />
+              <IconSparkles aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
               AI suggestion
             </div>
             <p className="mt-2 text-sm leading-6 text-studio-muted">
-              StudioHQ can turn this into a task, outline, or reusable knowledge item when workflows are connected.
+              Dreamz Ops can summarize the WhatsApp thread, suggest follow-ups, or attach this note to a booking when workflows are connected.
             </p>
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -50,7 +50,7 @@ export function AppShell({ activeRoute, children, onNavigate }: AppShellProps) {
               Cancel
             </Button>
             <Button onClick={() => setQuickCreateOpen(false)} variant="primary">
-              Save placeholder
+              Save draft
             </Button>
           </div>
         </div>

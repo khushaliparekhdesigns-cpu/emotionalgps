@@ -1,14 +1,14 @@
 import {
-  BarChart3,
-  BookOpen,
-  Bot,
-  Calculator,
-  FileText,
-  FolderKanban,
-  GalleryVerticalEnd,
-  LayoutDashboard,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+  IconCalendar,
+  IconCar,
+  IconChartBar,
+  IconFileText,
+  IconInbox,
+  IconLayoutDashboard,
+  IconSettings,
+  IconUsers,
+} from "@tabler/icons-react";
+import type { ComponentType, SVGProps } from "react";
 import type { RouteKey } from "../types";
 
 export type StudioRoute = {
@@ -16,7 +16,7 @@ export type StudioRoute = {
   label: string;
   path: string;
   description: string;
-  icon: LucideIcon;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
 };
 
 export const routes: StudioRoute[] = [
@@ -24,57 +24,57 @@ export const routes: StudioRoute[] = [
     key: "dashboard",
     label: "Dashboard",
     path: "/",
-    description: "Today, pipeline, and design operations at a glance.",
-    icon: LayoutDashboard,
+    description: "Live Dubai operational pulse for enquiries, fleet readiness, returns, and AED revenue.",
+    icon: IconLayoutDashboard,
   },
   {
-    key: "clients",
-    label: "Client Hub",
-    path: "/clients",
-    description: "Manage active clients, projects, notes, and next steps.",
-    icon: FolderKanban,
+    key: "inbox",
+    label: "Unified Inbox",
+    path: "/inbox",
+    description: "A shared communication hub for WhatsApp, email, web, and paid enquiries.",
+    icon: IconInbox,
   },
   {
-    key: "ai-studio",
-    label: "AI Studio",
-    path: "/ai-studio",
-    description: "Generate briefs, strategy, and design assets with AI.",
-    icon: Bot,
+    key: "customers",
+    label: "Customers",
+    path: "/customers",
+    description: "Every customer relationship, document, payment, and booking in one page.",
+    icon: IconUsers,
   },
   {
-    key: "knowledge",
-    label: "Knowledge Base",
-    path: "/knowledge",
-    description: "Reusable process docs, brand rules, and project memory.",
-    icon: BookOpen,
+    key: "fleet",
+    label: "Fleet",
+    path: "/fleet",
+    description: "Visual fleet control for Dreamz UAE availability, location, rates, revenue, and utilisation.",
+    icon: IconCar,
   },
   {
-    key: "inspiration",
-    label: "Inspiration Library",
-    path: "/inspiration",
-    description: "Curated visual references for future creative direction.",
-    icon: GalleryVerticalEnd,
+    key: "bookings",
+    label: "Bookings",
+    path: "/bookings",
+    description: "Calendar-style rental planning by day, week, and month.",
+    icon: IconCalendar,
   },
   {
-    key: "proposals",
-    label: "Proposal Generator",
-    path: "/proposals",
-    description: "Draft high-quality proposals from a lightweight intake.",
-    icon: FileText,
+    key: "analytics",
+    label: "Analytics",
+    path: "/analytics",
+    description: "Revenue, utilisation, booking trends, and customer intelligence.",
+    icon: IconChartBar,
   },
   {
-    key: "pricing",
-    label: "Pricing Calculator",
-    path: "/pricing",
-    description: "Estimate scope, margin, and packages with confidence.",
-    icon: Calculator,
+    key: "documents",
+    label: "Documents",
+    path: "/documents",
+    description: "Passports, Emirates IDs, visit visas, driver licences, agreements, and deposits.",
+    icon: IconFileText,
   },
   {
-    key: "business",
-    label: "Business Dashboard",
-    path: "/business",
-    description: "Revenue, capacity, conversion, and operational health.",
-    icon: BarChart3,
+    key: "settings",
+    label: "Settings",
+    path: "/settings",
+    description: "Team roles, automations, sources, payment rules, and operating preferences.",
+    icon: IconSettings,
   },
 ];
 

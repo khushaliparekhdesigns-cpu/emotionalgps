@@ -9,10 +9,10 @@ export type ClassValue =
 
 export type RouteKey =
   | "dashboard"
-  | "clients"
-  | "ai-studio"
-  | "knowledge"
-  | "inspiration"
-  | "proposals"
-  | "pricing"
-  | "business";
+  | "inbox"
+  | "customers"
+  | "fleet"
+  | "bookings"
+  | "analytics"
+  | "documents"
+  | "settings";
