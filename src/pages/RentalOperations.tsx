@@ -299,6 +299,51 @@ function StatusPill({ value }: { value: string }) {
   );
 }
 
+const editFieldClass =
+  "h-9 w-full rounded-xl border border-studio-line bg-white px-3 text-sm text-studio-ink outline-none focus:border-[#31C7B7] focus:ring-4 focus:ring-[#31C7B7]/10";
+
+function CardMenu({
+  items,
+}: {
+  items: {
+    label: string;
+    onClick?: () => void;
+    tone?: "default" | "danger";
+  }[];
+}) {
+  return (
+    <details className="group relative">
+      <summary className="grid h-8 w-8 cursor-pointer list-none place-items-center rounded-lg text-studio-soft transition hover:bg-studio-panel hover:text-studio-ink [&::-webkit-details-marker]:hidden">
+        <MoreHorizontal aria-hidden="true" className="h-4 w-4" />
+        <span className="sr-only">Open card menu</span>
+      </summary>
+      <div className="absolute right-0 top-9 z-20 w-40 rounded-2xl border border-studio-line bg-white p-1.5 shadow-[0_18px_60px_rgba(8,27,51,0.14)]">
+        {items.map((item) => (
+          <button
+            className={cn(
+              "block w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition hover:bg-studio-panel",
+              item.tone === "danger" ? "text-rose-600" : "text-studio-ink",
+            )}
+            key={item.label}
+            onClick={item.onClick}
+            type="button"
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </details>
+  );
+}
+
+function EditPanel({ children }: { children: ReactNode }) {
+  return (
+    <div className="mt-4 rounded-2xl border border-[#31C7B7]/30 bg-[#E7FAF7] p-4">
+      {children}
+    </div>
+  );
+}
+
 function MiniMetric({
   icon: Icon,
   label,
@@ -369,9 +414,17 @@ function SparklineBars({ values }: { values: number[] }) {
   );
 }
 
-function CustomerSummary({ customer }: { customer: Customer }) {
+function CustomerSummary({
+  customer,
+  editing = false,
+  onEdit,
+}: {
+  customer: Customer;
+  editing?: boolean;
+  onEdit?: () => void;
+}) {
   return (
-    <Card className="overflow-hidden">
+    <Card>
       <CardHeader className="bg-studio-panel/70">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -383,8 +436,19 @@ function CustomerSummary({ customer }: { customer: Customer }) {
               {customer.location} · customer since {customer.since}
             </p>
           </div>
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-white text-studio-ink ring-1 ring-studio-line">
-            <UserRound aria-hidden="true" className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-white text-studio-ink ring-1 ring-studio-line">
+              <UserRound aria-hidden="true" className="h-4 w-4" />
+            </div>
+            {onEdit ? (
+              <CardMenu
+                items={[
+                  { label: "Edit", onClick: onEdit },
+                  { label: "Update", onClick: onEdit },
+                  { label: "Archive", tone: "danger" },
+                ]}
+              />
+            ) : null}
           </div>
         </div>
       </CardHeader>
@@ -424,6 +488,21 @@ function CustomerSummary({ customer }: { customer: Customer }) {
             ))}
           </div>
         </div>
+
+        {editing ? (
+          <EditPanel>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input label="Customer name" defaultValue={customer.name} />
+              <Input label="Phone" defaultValue={customer.phone} />
+              <Input label="Email" defaultValue={customer.email} />
+              <Input label="Location" defaultValue={customer.location} />
+            </div>
+            <div className="mt-3 flex justify-end gap-2">
+              <Button size="sm" variant="secondary">Cancel</Button>
+              <Button size="sm" variant="primary">Save details</Button>
+            </div>
+          </EditPanel>
+        ) : null}
       </CardBody>
     </Card>
   );
@@ -1149,8 +1228,12 @@ function InboxView() {
 
 function CustomersView() {
   const [selectedCustomerId, setSelectedCustomerId] = useState(customers[0].id);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
   const selectedCustomer = getCustomer(selectedCustomerId);
   const currentBooking = bookings.find((booking) => booking.id === selectedCustomer.currentBookingId);
+  const toggleEditing = (section: string) => {
+    setEditingSection((current) => (current === section ? null : section));
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
@@ -1190,16 +1273,60 @@ function CustomersView() {
       </Card>
 
       <div className="space-y-6">
-        <CustomerSummary customer={selectedCustomer} />
+        <CustomerSummary
+          customer={selectedCustomer}
+          editing={editingSection === "details"}
+          onEdit={() => toggleEditing("details")}
+        />
 
         <div className="grid gap-6 xl:grid-cols-2">
           <Card>
             <CardHeader>
-              <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Current booking</h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Current booking</h3>
+                <CardMenu
+                  items={[
+                    { label: "Edit booking", onClick: () => toggleEditing("booking") },
+                    { label: "Update", onClick: () => toggleEditing("booking") },
+                    { label: "Archive", tone: "danger" },
+                  ]}
+                />
+              </div>
             </CardHeader>
             <CardBody>
               {currentBooking ? (
-                <BookingRow booking={currentBooking} compact />
+                <>
+                  <BookingRow booking={currentBooking} compact />
+                  {editingSection === "booking" ? (
+                    <EditPanel>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="block">
+                          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Car</span>
+                          <select className={editFieldClass} defaultValue={currentBooking.vehicleId}>
+                            {vehicles.slice(0, 10).map((vehicle) => (
+                              <option key={vehicle.id} value={vehicle.id}>{vehicle.model}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <Input label="Pickup" defaultValue={currentBooking.pickup} />
+                        <Input label="Return" defaultValue={currentBooking.returnAt} />
+                        <Input label="Amount" defaultValue={String(currentBooking.value)} />
+                        <label className="block sm:col-span-2">
+                          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Status</span>
+                          <select className={editFieldClass} defaultValue={currentBooking.status}>
+                            {["Confirmed", "In progress", "Awaiting payment", "Draft", "Completed"].map((status) => (
+                              <option key={status}>{status}</option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <div className="mt-3 flex justify-end gap-2">
+                        <Button size="sm" variant="secondary">Cancel</Button>
+                        <Button size="sm" variant="primary">Save booking</Button>
+                      </div>
+                    </EditPanel>
+                  ) : null}
+                </>
               ) : (
                 <div className="rounded-2xl border border-dashed border-studio-line bg-studio-panel p-6 text-sm text-studio-muted">
                   No active booking. Suggested follow-up available from customer preferences.
@@ -1210,7 +1337,16 @@ function CustomersView() {
 
           <Card>
             <CardHeader>
-              <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Documents</h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Documents</h3>
+                <CardMenu
+                  items={[
+                    { label: "Edit", onClick: () => toggleEditing("documents") },
+                    { label: "Update", onClick: () => toggleEditing("documents") },
+                    { label: "Archive", tone: "danger" },
+                  ]}
+                />
+              </div>
             </CardHeader>
             <CardBody className="space-y-3">
               {selectedCustomer.uploadedDocuments.map((document) => (
@@ -1219,9 +1355,40 @@ function CustomersView() {
                     <FileText aria-hidden="true" className="h-4 w-4 text-studio-soft" />
                     <p className="text-sm font-medium text-studio-ink">{document.name}</p>
                   </div>
-                  <StatusPill value={document.status} />
+                  <div className="flex items-center gap-2">
+                    <StatusPill value={document.status} />
+                    <CardMenu
+                      items={[
+                        { label: "Replace document", onClick: () => toggleEditing(`document:${document.name}`) },
+                        { label: "Mark verified", onClick: () => toggleEditing(`document:${document.name}`) },
+                        { label: "Mark missing", onClick: () => toggleEditing(`document:${document.name}`) },
+                        { label: "Update expiry", onClick: () => toggleEditing(`document:${document.name}`) },
+                      ]}
+                    />
+                  </div>
                 </div>
               ))}
+              {editingSection?.startsWith("document:") || editingSection === "documents" ? (
+                <EditPanel>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Input label="Document name" defaultValue={selectedCustomer.uploadedDocuments[0]?.name} />
+                    <label className="block">
+                      <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Status</span>
+                      <select className={editFieldClass} defaultValue="Verified">
+                        {["Verified", "Expiring", "Missing"].map((status) => (
+                          <option key={status}>{status}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <Input label="Expiry date" defaultValue="20 Jun 2027" />
+                    <Input label="Replace file" defaultValue="Upload new file..." />
+                  </div>
+                  <div className="mt-3 flex justify-end gap-2">
+                    <Button size="sm" variant="secondary">Cancel</Button>
+                    <Button size="sm" variant="primary">Update document</Button>
+                  </div>
+                </EditPanel>
+              ) : null}
             </CardBody>
           </Card>
         </div>
@@ -1229,34 +1396,120 @@ function CustomersView() {
         <div className="grid gap-6 xl:grid-cols-2">
           <Card>
             <CardHeader>
-              <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Internal notes</h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Internal notes</h3>
+                <CardMenu
+                  items={[
+                    { label: "Add note", onClick: () => toggleEditing("notes") },
+                    { label: "Edit", onClick: () => toggleEditing("notes") },
+                    { label: "Delete note", onClick: () => toggleEditing("notes"), tone: "danger" },
+                  ]}
+                />
+              </div>
             </CardHeader>
             <CardBody className="space-y-3">
               {selectedCustomer.notes.map((note) => (
-                <div className="rounded-xl border border-studio-line bg-studio-panel p-4 text-sm leading-6 text-studio-muted" key={note}>
-                  {note}
+                <div className="flex items-start justify-between gap-3 rounded-xl border border-studio-line bg-studio-panel p-4 text-sm leading-6 text-studio-muted" key={note}>
+                  <span>{note}</span>
+                  <CardMenu
+                    items={[
+                      { label: "Edit", onClick: () => toggleEditing(`note:${note}`) },
+                      { label: "Update", onClick: () => toggleEditing(`note:${note}`) },
+                      { label: "Delete", onClick: () => toggleEditing(`note:${note}`), tone: "danger" },
+                    ]}
+                  />
                 </div>
               ))}
+              {editingSection === "notes" || editingSection?.startsWith("note:") ? (
+                <EditPanel>
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Note</span>
+                    <textarea
+                      className="min-h-24 w-full rounded-xl border border-studio-line bg-white px-3 py-2 text-sm text-studio-ink outline-none focus:border-[#31C7B7] focus:ring-4 focus:ring-[#31C7B7]/10"
+                      defaultValue={selectedCustomer.notes[0]}
+                    />
+                  </label>
+                  <div className="mt-3 flex justify-end gap-2">
+                    <Button size="sm" variant="secondary">Delete</Button>
+                    <Button size="sm" variant="primary">Save note</Button>
+                  </div>
+                </EditPanel>
+              ) : null}
             </CardBody>
           </Card>
 
           <Card>
             <CardHeader>
-              <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Payment history</h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Payment history</h3>
+                <CardMenu
+                  items={[
+                    { label: "Edit", onClick: () => toggleEditing("payments") },
+                    { label: "Update", onClick: () => toggleEditing("payments") },
+                    { label: "Archive", tone: "danger" },
+                  ]}
+                />
+              </div>
             </CardHeader>
             <CardBody className="space-y-3">
               {selectedCustomer.paymentHistory.map((payment) => (
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-white p-3" key={payment.label}>
-                  <div>
-                    <p className="text-sm font-medium text-studio-ink">{payment.label}</p>
-                    <p className="mt-1 text-xs text-studio-muted">{formatCurrency(payment.amount)}</p>
-                    <p className="mt-0.5 text-xs text-studio-soft">
-                      {payment.status === "Deposit held"
-                        ? `Deposit held • ${payment.method}`
-                        : `${payment.status} via ${payment.method}`}
-                    </p>
+                <div className="rounded-xl border border-studio-line bg-white p-3" key={payment.label}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-studio-ink">{payment.label}</p>
+                      <p className="mt-1 text-xs text-studio-muted">{formatCurrency(payment.amount)}</p>
+                      <p className="mt-0.5 text-xs text-studio-soft">
+                        {payment.status === "Deposit held"
+                          ? `Deposit held • ${payment.method}`
+                          : `${payment.status} via ${payment.method}`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <StatusPill value={payment.status} />
+                      <CardMenu
+                        items={[
+                          { label: "Edit", onClick: () => toggleEditing(`payment:${payment.label}`) },
+                          { label: payment.status === "Paid" ? "Mark pending" : "Mark paid", onClick: () => toggleEditing(`payment:${payment.label}`) },
+                          { label: "Update method", onClick: () => toggleEditing(`payment:${payment.label}`) },
+                        ]}
+                      />
+                    </div>
                   </div>
-                  <StatusPill value={payment.status} />
+                  {editingSection === "payments" || editingSection === `payment:${payment.label}` ? (
+                    <EditPanel>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Input label="Amount" defaultValue={String(payment.amount)} />
+                        <Input label="Date" defaultValue={payment.date} />
+                        <label className="block">
+                          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Payment status</span>
+                          <select className={editFieldClass} defaultValue={payment.status}>
+                            {["Paid", "Pending", "Deposit held"].map((status) => (
+                              <option key={status}>{status}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="block">
+                          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Payment method</span>
+                          <select className={editFieldClass} defaultValue={payment.method}>
+                            {["Cash", "Card", "Bank transfer", "Payment link"].map((method) => (
+                              <option key={method}>{method}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="block sm:col-span-2">
+                          <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Notes</span>
+                          <textarea
+                            className="min-h-20 w-full rounded-xl border border-studio-line bg-white px-3 py-2 text-sm text-studio-ink outline-none focus:border-[#31C7B7] focus:ring-4 focus:ring-[#31C7B7]/10"
+                            defaultValue={payment.notes}
+                          />
+                        </label>
+                      </div>
+                      <div className="mt-3 flex justify-end gap-2">
+                        <Button size="sm" variant="secondary">Cancel</Button>
+                        <Button size="sm" variant="primary">Save payment</Button>
+                      </div>
+                    </EditPanel>
+                  ) : null}
                 </div>
               ))}
             </CardBody>

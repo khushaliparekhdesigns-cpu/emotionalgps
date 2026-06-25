@@ -41,6 +41,8 @@ export type Customer = {
     amount: number;
     status: "Paid" | "Pending" | "Deposit held";
     method: "Cash" | "Card" | "Bank transfer" | "Payment link" | "Crypto";
+    date: string;
+    notes: string;
   }[];
   previousBookings: string[];
 };
@@ -308,13 +310,24 @@ export const customers: Customer[] = customerNames.map((name, index) => {
         amount: 1800 + index * 95,
         status: index % 6 === 0 ? "Pending" : "Paid",
         method: ["Card", "Payment link", "Bank transfer"][index % 3] as "Card" | "Payment link" | "Bank transfer",
+        date: "20 Jun 2026",
+        notes: index % 6 === 0 ? "Balance reminder sent on WhatsApp." : "Confirmed before delivery.",
       },
-      { label: "Security deposit", amount: 5000, status: "Deposit held", method: "Cash" },
+      {
+        label: "Security deposit",
+        amount: 5000,
+        status: "Deposit held",
+        method: "Cash",
+        date: "20 Jun 2026",
+        notes: "Held until vehicle inspection is complete.",
+      },
       {
         label: "May rental",
         amount: 1400 + index * 75,
         status: "Paid",
         method: index % 2 === 0 ? "Bank transfer" : "Card",
+        date: "18 May 2026",
+        notes: "Closed with no payment exceptions.",
       },
     ],
     previousBookings: [
