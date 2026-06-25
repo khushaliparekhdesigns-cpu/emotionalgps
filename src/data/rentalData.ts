@@ -40,6 +40,7 @@ export type Customer = {
     label: string;
     amount: number;
     status: "Paid" | "Pending" | "Deposit held";
+    method: "Cash" | "Card" | "Bank transfer" | "Payment link" | "Crypto";
   }[];
   previousBookings: string[];
 };
@@ -302,9 +303,19 @@ export const customers: Customer[] = customerNames.map((name, index) => {
       { name: "Rental agreement", status: index % 5 === 0 ? "Expiring" : "Verified" },
     ],
     paymentHistory: [
-      { label: "June rental", amount: 1800 + index * 95, status: index % 6 === 0 ? "Pending" : "Paid" },
-      { label: "Security deposit", amount: 5000, status: "Deposit held" },
-      { label: "May rental", amount: 1400 + index * 75, status: "Paid" },
+      {
+        label: "June rental",
+        amount: 1800 + index * 95,
+        status: index % 6 === 0 ? "Pending" : "Paid",
+        method: ["Card", "Payment link", "Bank transfer"][index % 3] as "Card" | "Payment link" | "Bank transfer",
+      },
+      { label: "Security deposit", amount: 5000, status: "Deposit held", method: "Cash" },
+      {
+        label: "May rental",
+        amount: 1400 + index * 75,
+        status: "Paid",
+        method: index % 2 === 0 ? "Bank transfer" : "Card",
+      },
     ],
     previousBookings: [
       vehicles[(index + 4) % vehicles.length].model,

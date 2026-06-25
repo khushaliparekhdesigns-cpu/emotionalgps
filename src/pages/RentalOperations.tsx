@@ -1250,6 +1250,11 @@ function CustomersView() {
                   <div>
                     <p className="text-sm font-medium text-studio-ink">{payment.label}</p>
                     <p className="mt-1 text-xs text-studio-muted">{formatCurrency(payment.amount)}</p>
+                    <p className="mt-0.5 text-xs text-studio-soft">
+                      {payment.status === "Deposit held"
+                        ? `Deposit held • ${payment.method}`
+                        : `${payment.status} via ${payment.method}`}
+                    </p>
                   </div>
                   <StatusPill value={payment.status} />
                 </div>
