@@ -1992,6 +1992,9 @@ function AnalyticsView() {
   const b2cShare = 100 - b2bShare;
   const b2bBookings = bookings.filter((booking) => booking.bookingType === "B2B").length;
   const b2cBookings = bookings.filter((booking) => booking.bookingType === "B2C").length;
+  const b2bAvgBooking = Math.round(b2bRevenue / Math.max(b2bBookings, 1));
+  const b2cAvgBooking = Math.round(b2cRevenue / Math.max(b2cBookings, 1));
+  const b2cTargetProgress = Math.min(100, Math.round((b2cRevenue / 900000) * 100));
   const topBookedCars = [...vehicles]
     .map((vehicle, index) => ({
       ...vehicle,
@@ -2028,26 +2031,99 @@ function AnalyticsView() {
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
+      <Card className="overflow-hidden border-white bg-white shadow-[0_24px_80px_rgba(8,27,51,0.12)]">
         <CardBody className="p-5">
-          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Revenue source</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-[-0.06em]">B2B vs B2C revenue split</h2>
-              <p className="mt-2 text-sm text-white/[0.68]">This month, compared with last month.</p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:w-[560px]">
-              <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4">
-                <p className="text-sm font-semibold text-white/[0.72]">B2B revenue</p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{formatCurrency(b2bRevenue)}</p>
-                <p className="mt-1 text-sm text-[#31C7B7]">{b2bShare}% split · +12% vs last month</p>
+          <div className="mb-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Revenue source</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-[-0.06em] text-[#081B33]">B2B vs B2C revenue split</h2>
+            <p className="mt-2 text-sm text-studio-muted">This month, compared with last month.</p>
+          </div>
+
+          <div className="grid gap-5 xl:grid-cols-[1fr_1.1fr_1fr] xl:items-center">
+            <div className="rounded-3xl border border-[#31C7B7]/30 bg-[#E7FAF7] p-5">
+              <p className="text-sm font-semibold text-[#087A70]">B2C Revenue</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.06em] text-[#081B33]">{formatCurrency(b2cRevenue)}</p>
+              <div className="mt-4 grid gap-3 text-sm">
+                <div className="flex justify-between gap-3">
+                  <span className="text-studio-muted">% split</span>
+                  <span className="font-semibold text-[#081B33]">{b2cShare}%</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-studio-muted">Growth</span>
+                  <span className="font-semibold text-emerald-700">+18% vs last month</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-studio-muted">Avg booking value</span>
+                  <span className="font-semibold text-[#081B33]">{formatCurrency(b2cAvgBooking)}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-studio-muted">Avg duration</span>
+                  <span className="font-semibold text-[#081B33]">2.8 days</span>
+                </div>
               </div>
-              <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4">
-                <p className="text-sm font-semibold text-white/[0.72]">B2C revenue</p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{formatCurrency(b2cRevenue)}</p>
-                <p className="mt-1 text-sm text-[#31C7B7]">{b2cShare}% split · +18% vs last month</p>
+            </div>
+
+            <div className="rounded-3xl border border-studio-line bg-[#F8FAFC] p-5">
+              <div className="flex items-center justify-between gap-3 text-sm font-semibold">
+                <span className="text-[#31C7B7]">B2C {b2cShare}%</span>
+                <span className="text-[#081B33]">B2B {b2bShare}%</span>
+              </div>
+              <div className="mt-4 h-5 overflow-hidden rounded-full bg-[#081B33]">
+                <div
+                  className="h-full rounded-r-full bg-[#31C7B7]"
+                  style={{ width: `${b2cShare}%` }}
+                />
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
+                  <p className="text-xs text-studio-soft">B2C bookings</p>
+                  <p className="mt-1 text-2xl font-semibold text-[#081B33]">{b2cBookings}</p>
+                </div>
+                <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
+                  <p className="text-xs text-studio-soft">B2B contracts</p>
+                  <p className="mt-1 text-2xl font-semibold text-[#081B33]">{b2bVehicles.length}</p>
+                </div>
+              </div>
+              <div className="mt-4 rounded-2xl border border-[#31C7B7]/20 bg-white p-3 text-sm text-studio-muted">
+                B2C target progress: <span className="font-semibold text-[#081B33]">{b2cTargetProgress}%</span>
               </div>
             </div>
+
+            <div className="rounded-3xl border border-[#081B33]/10 bg-[#081B33] p-5 text-white">
+              <p className="text-sm font-semibold text-white/[0.72]">B2B Revenue</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{formatCurrency(b2bRevenue)}</p>
+              <div className="mt-4 grid gap-3 text-sm">
+                <div className="flex justify-between gap-3">
+                  <span className="text-white/[0.62]">% split</span>
+                  <span className="font-semibold">{b2bShare}%</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-white/[0.62]">Growth</span>
+                  <span className="font-semibold text-[#31C7B7]">+12% vs last month</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-white/[0.62]">Active contracts</span>
+                  <span className="font-semibold">{b2bVehicles.length}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-white/[0.62]">Avg duration</span>
+                  <span className="font-semibold">21.4 days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {[
+              ["B2C growing faster", "B2C revenue is +18% vs +12% for B2B."],
+              ["B2B still dominant", `${b2bShare}% of monthly revenue remains contract-led.`],
+              ["B2C target progress", `${b2cTargetProgress}% of the monthly B2C target reached.`],
+            ].map(([title, detail]) => (
+              <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={title}>
+                <p className="text-sm font-semibold text-[#081B33]">{title}</p>
+                <p className="mt-1 text-xs leading-5 text-studio-muted">{detail}</p>
+              </div>
+            ))}
           </div>
         </CardBody>
       </Card>
