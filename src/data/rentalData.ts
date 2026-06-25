@@ -8,11 +8,16 @@ export type VehicleStatus =
   | "Service due soon";
 
 export type BookingStatus =
-  | "Confirmed"
-  | "In progress"
-  | "Awaiting payment"
   | "Draft"
-  | "Completed";
+  | "Reserved"
+  | "Documents pending"
+  | "Deposit pending"
+  | "Confirmed"
+  | "Delivered"
+  | "In progress"
+  | "Return due"
+  | "Returned"
+  | "Closed";
 
 export type CustomerTier = "VIP" | "Black" | "Corporate" | "Private";
 
@@ -72,12 +77,15 @@ export type Booking = {
   customerId: string;
   vehicleId: string;
   pickup: string;
+  pickupUrgency: "less than 30 mins" | "less than 2 hours" | "later today";
   returnAt: string;
   status: BookingStatus;
-  payment: "Paid" | "Pending" | "Deposit only";
+  payment: "Deposit received" | "Balance pending" | "Fully paid";
   driver: string;
+  driverAssigned: boolean;
   value: number;
   view: "Day" | "Week" | "Month";
+  bookingType: "B2B" | "B2C";
 };
 
 export type Conversation = {
@@ -356,14 +364,28 @@ export const bookings: Booking[] = Array.from({ length: 64 }, (_, index) => ({
   pickup: `${["09:00", "10:30", "12:00", "14:30", "16:00", "18:30"][index % 6]} · ${
     locations[(index + 1) % locations.length]
   }`,
+  pickupUrgency: ["less than 30 mins", "less than 2 hours", "later today"][index % 3] as Booking["pickupUrgency"],
   returnAt: `${["Today", "Tomorrow", "23 Jun", "24 Jun", "26 Jun"][index % 5]} · ${
     ["11:00", "13:00", "15:30", "17:00"][index % 4]
   }`,
-  status: ["Confirmed", "In progress", "Awaiting payment", "Draft", "Completed"][index % 5] as BookingStatus,
-  payment: ["Paid", "Pending", "Deposit only"][index % 3] as Booking["payment"],
-  driver: ["Mason", "Elliot", "Riya", "Theo", "Nadia", "Self-drive"][index % 6],
+  status: [
+    "Draft",
+    "Reserved",
+    "Documents pending",
+    "Deposit pending",
+    "Confirmed",
+    "Delivered",
+    "In progress",
+    "Return due",
+    "Returned",
+    "Closed",
+  ][index % 10] as BookingStatus,
+  payment: ["Deposit received", "Balance pending", "Fully paid"][index % 3] as Booking["payment"],
+  driver: index % 7 === 0 ? "Unassigned" : ["Mason", "Elliot", "Riya", "Theo", "Nadia", "Self-drive"][index % 6],
+  driverAssigned: index % 7 !== 0,
   value: 420 + (index % 9) * 260 + index * 35,
   view: ["Day", "Week", "Month"][index % 3] as Booking["view"],
+  bookingType: vehicles[(index * 2) % vehicles.length].bookingType,
 }));
 
 const sources: Conversation["source"][] = ["WhatsApp", "Email", "Website", "Google Ads", "Meta Ads"];

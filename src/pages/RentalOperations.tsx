@@ -69,6 +69,11 @@ const statusStyles: Record<string, string> = {
   Delivery: "border-violet-200 bg-violet-50 text-violet-700",
   Reserved: "border-studio-purple/20 bg-studio-purple-soft text-studio-purple",
   "Service due soon": "border-amber-200 bg-amber-50 text-amber-700",
+  "Documents pending": "border-amber-200 bg-amber-50 text-amber-700",
+  "Deposit pending": "border-orange-200 bg-orange-50 text-orange-700",
+  "Return due": "border-rose-200 bg-rose-50 text-rose-700",
+  Returned: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  Closed: "border-zinc-200 bg-zinc-50 text-zinc-600",
   Open: "border-sky-200 bg-sky-50 text-sky-700",
   "Awaiting reply": "border-amber-200 bg-amber-50 text-amber-700",
   Assigned: "border-studio-purple/20 bg-studio-purple-soft text-studio-purple",
@@ -81,6 +86,9 @@ const statusStyles: Record<string, string> = {
   Paid: "border-emerald-200 bg-emerald-50 text-emerald-700",
   Pending: "border-amber-200 bg-amber-50 text-amber-700",
   "Deposit only": "border-violet-200 bg-violet-50 text-violet-700",
+  "Deposit received": "border-sky-200 bg-sky-50 text-sky-700",
+  "Balance pending": "border-amber-200 bg-amber-50 text-amber-700",
+  "Fully paid": "border-emerald-200 bg-emerald-50 text-emerald-700",
   Verified: "border-emerald-200 bg-emerald-50 text-emerald-700",
   "Needs review": "border-amber-200 bg-amber-50 text-amber-700",
   Expiring: "border-orange-200 bg-orange-50 text-orange-700",
@@ -1316,7 +1324,18 @@ function CustomersView() {
                         <label className="block sm:col-span-2">
                           <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-studio-soft">Status</span>
                           <select className={editFieldClass} defaultValue={currentBooking.status}>
-                            {["Confirmed", "In progress", "Awaiting payment", "Draft", "Completed"].map((status) => (
+                            {[
+                              "Draft",
+                              "Reserved",
+                              "Documents pending",
+                              "Deposit pending",
+                              "Confirmed",
+                              "Delivered",
+                              "In progress",
+                              "Return due",
+                              "Returned",
+                              "Closed",
+                            ].map((status) => (
                               <option key={status}>{status}</option>
                             ))}
                           </select>
@@ -1775,42 +1794,86 @@ function FleetView() {
 function BookingRow({ booking, compact = false }: { booking: Booking; compact?: boolean }) {
   const customer = getCustomer(booking.customerId);
   const vehicle = getVehicle(booking.vehicleId);
+  const urgencyClass =
+    booking.pickupUrgency === "less than 30 mins"
+      ? "border-rose-200 bg-rose-50 text-rose-700"
+      : booking.pickupUrgency === "less than 2 hours"
+        ? "border-amber-200 bg-amber-50 text-amber-700"
+        : "border-studio-line bg-studio-panel text-studio-muted";
+  const paymentHelper =
+    booking.payment === "Deposit received"
+      ? "Balance due at delivery"
+      : booking.payment === "Balance pending"
+        ? "Collect before handover"
+        : "Ready for delivery";
 
   return (
     <div
       className={cn(
-        "rounded-2xl border border-studio-line bg-white p-4 shadow-sm",
-        compact ? "space-y-3" : "grid gap-4 lg:grid-cols-[1.1fr_1fr_1fr_0.8fr_0.7fr]",
+        "group rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-[0_18px_60px_rgba(8,27,51,0.08)]",
+        booking.pickupUrgency === "less than 30 mins" ? "border-rose-200" : "border-studio-line",
+        compact ? "space-y-3" : "space-y-4",
       )}
     >
-      <div>
-        <p className="text-sm font-semibold text-studio-ink">{customer.name}</p>
-        <p className="mt-1 text-xs text-studio-muted">{customer.tier} · {customer.location}</p>
-      </div>
-      <div>
-        <p className="text-sm font-medium text-studio-ink">{vehicle.model}</p>
-        <p className="mt-1 text-xs text-studio-muted">{vehicle.plate}</p>
-      </div>
-      <div>
-        <p className="text-xs text-studio-soft">Pickup</p>
-        <p className="mt-1 text-sm text-studio-ink">{booking.pickup}</p>
-      </div>
-      <div>
-        <p className="text-xs text-studio-soft">Return</p>
-        <p className="mt-1 text-sm text-studio-ink">{booking.returnAt}</p>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <StatusPill value={booking.status} />
-        <StatusPill value={booking.payment} />
-      </div>
-      {!compact ? (
-        <div className="lg:col-span-5 flex flex-wrap items-center justify-between gap-3 border-t border-studio-line pt-3">
-          <p className="text-sm text-studio-muted">
-            Driver: <span className="font-medium text-studio-ink">{booking.driver}</span>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-[#081B33]">{customer.name}</p>
+          <p className="mt-1 text-xs font-medium text-studio-muted">
+            {booking.bookingType} • {booking.bookingType === "B2B" ? "Monthly" : customer.location}
           </p>
-          <p className="text-sm font-semibold text-studio-ink">{formatCurrency(booking.value)}</p>
         </div>
-      ) : null}
+        <div className="flex items-center gap-2">
+          <StatusPill value={booking.status} />
+          {!compact ? (
+            <div className="opacity-0 transition group-hover:opacity-100">
+              <CardMenu
+                items={[
+                  { label: "Edit booking" },
+                  { label: "Reassign driver" },
+                  { label: "Mark delivered" },
+                  { label: "Extend booking" },
+                  { label: "Collect payment" },
+                  { label: "Upload documents" },
+                  { label: "Cancel booking", tone: "danger" },
+                ]}
+              />
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className={cn("grid gap-3", compact ? "grid-cols-1" : "lg:grid-cols-[1fr_0.9fr_0.9fr_0.9fr]")}>
+        <div>
+          <p className="text-xs text-studio-soft">Vehicle</p>
+          <p className="mt-1 text-sm font-semibold text-[#081B33]">{vehicle.model}</p>
+          <p className="mt-0.5 text-xs text-studio-muted">{vehicle.plate}</p>
+        </div>
+        <div>
+          <p className="text-xs text-studio-soft">Pickup</p>
+          <p className="mt-1 text-sm font-semibold text-[#081B33]">{booking.pickup}</p>
+          <span className={cn("mt-2 inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold", urgencyClass)}>
+            {booking.pickupUrgency}
+          </span>
+        </div>
+        <div>
+          <p className="text-xs text-studio-soft">Return</p>
+          <p className="mt-1 text-sm font-semibold text-[#081B33]">{booking.returnAt}</p>
+        </div>
+        <div>
+          <p className="text-xs text-studio-soft">Driver</p>
+          <p className={cn("mt-1 text-sm font-semibold", booking.driverAssigned ? "text-[#081B33]" : "text-amber-700")}>
+            Driver: {booking.driverAssigned ? booking.driver : "Unassigned ⚠"}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-studio-line pt-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusPill value={booking.payment} />
+          <span className="text-xs font-medium text-studio-muted">{paymentHelper}</span>
+        </div>
+        <p className="text-sm font-semibold text-[#081B33]">{formatCurrency(booking.value)}</p>
+      </div>
     </div>
   );
 }
@@ -1818,6 +1881,14 @@ function BookingRow({ booking, compact = false }: { booking: Booking; compact?: 
 function BookingsView() {
   const [view, setView] = useState<Booking["view"]>("Day");
   const visibleBookings = bookings.filter((booking) => booking.view === view).slice(0, 14);
+  const viewDescriptions = {
+    Day: "Operational execution",
+    Week: "Planning view",
+    Month: "Utilisation overview",
+  };
+  const dueReturns = visibleBookings.filter((booking) => booking.status === "Return due").length;
+  const pendingPayments = visibleBookings.filter((booking) => booking.payment === "Balance pending").length;
+  const unassignedDrivers = visibleBookings.filter((booking) => !booking.driverAssigned).length;
 
   return (
     <div className="space-y-6">
@@ -1827,14 +1898,17 @@ function BookingsView() {
             {(["Day", "Week", "Month"] as Booking["view"][]).map((item) => (
               <button
                 className={cn(
-                  "rounded-lg px-4 py-2 text-sm font-medium transition",
-                  view === item ? "bg-studio-ink text-white" : "text-studio-muted hover:text-studio-ink",
+                  "rounded-lg px-4 py-2 text-left text-sm font-medium transition",
+                  view === item ? "bg-[#081B33] text-white" : "text-studio-muted hover:text-studio-ink",
                 )}
                 key={item}
                 onClick={() => setView(item)}
                 type="button"
               >
-                {item}
+                <span className="block">{item}</span>
+                <span className={cn("block text-[11px]", view === item ? "text-white/[0.64]" : "text-studio-soft")}>
+                  {viewDescriptions[item]}
+                </span>
               </button>
             ))}
           </div>
@@ -1845,10 +1919,26 @@ function BookingsView() {
         </CardBody>
       </Card>
 
+      <div className="grid gap-3 md:grid-cols-3">
+        {[
+          ["Returns due", dueReturns, "Need vehicle inspection"],
+          ["Payments pending", pendingPayments, "Collect before handover"],
+          ["Drivers unassigned", unassignedDrivers, "Assign before pickup"],
+        ].map(([label, value, helper]) => (
+          <Card className="border-white shadow-[0_14px_45px_rgba(8,27,51,0.05)]" key={String(label)}>
+            <CardBody className="p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft">{label}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.06em] text-[#081B33]">{value}</p>
+              <p className="mt-1 text-sm text-studio-muted">{helper}</p>
+            </CardBody>
+          </Card>
+        ))}
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <Card>
           <CardHeader>
-            <SectionHeading eyebrow="Calendar" title={`${view} booking plan`} />
+            <SectionHeading eyebrow="Execution" title={`${view} booking plan`} />
           </CardHeader>
           <CardBody className="space-y-3">
             {visibleBookings.map((booking) => (
@@ -1859,18 +1949,31 @@ function BookingsView() {
 
         <Card>
           <CardHeader>
-            <SectionHeading eyebrow="Availability" title="Available today" />
+            <SectionHeading eyebrow="Assign faster" title="Available today" />
           </CardHeader>
           <CardBody className="space-y-3">
             {vehicles
-              .filter((vehicle) => vehicle.status === "Available")
+              .filter((vehicle) => vehicle.status === "Available" || vehicle.status === "Service due soon")
               .slice(0, 8)
               .map((vehicle) => (
-                <div className="flex items-center gap-3 rounded-xl border border-studio-line bg-studio-panel p-3" key={vehicle.id}>
+                <div className="rounded-xl border border-studio-line bg-studio-panel p-3" key={vehicle.id}>
+                  <div className="flex items-center gap-3">
                   <img alt="" className="h-12 w-16 rounded-lg object-cover" src={vehicle.image} />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-studio-ink">{vehicle.model}</p>
                     <p className="mt-1 text-xs text-studio-muted">{vehicle.location}</p>
+                  </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Badge tone={vehicle.bookingType === "B2B" ? "accent" : "neutral"}>{vehicle.bookingType}</Badge>
+                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                      {vehicle.idleTime}
+                    </span>
+                    {vehicle.status === "Service due soon" ? (
+                      <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                        {vehicle.serviceDue}
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               ))}
