@@ -2373,6 +2373,9 @@ function DocumentsView() {
   const pendingVerification = documents.filter((document) => document.status === "Pending verification").length;
   const expiringSoon = documents.filter((document) => document.expiryDate.includes("Expires")).length;
   const verifiedDocs = documents.filter((document) => document.status === "Verified").length;
+  const recentUploads = documents
+    .filter((document) => document.status === "Received" || document.status === "Pending verification")
+    .slice(0, 4);
   const quickFilters = [
     ["Missing docs", missingDocs],
     ["Expiring soon", expiringSoon],
@@ -2385,27 +2388,66 @@ function DocumentsView() {
   return (
     <div className="space-y-6">
       <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
-        <CardBody className="grid gap-5 p-5 xl:grid-cols-[1.1fr_0.9fr] xl:items-center">
-          <div>
+        <CardBody className="space-y-5 p-5">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+            <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Verification vault</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-[-0.055em]">
-              Legal memory for customer IDs, contracts, invoices and vehicle condition.
+              Document intelligence and risk center
             </h2>
             <p className="mt-2 text-sm leading-6 text-white/[0.70]">
               Primary flow: open a WhatsApp attachment in Unified Inbox, click "Save to Documents", and the file is linked to the customer profile automatically.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              ["Verified", verifiedDocs],
-              ["Pending", pendingVerification],
-              ["Missing", missingDocs],
-            ].map(([label, value]) => (
-              <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4" key={String(label)}>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/[0.55]">{label}</p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{value}</p>
+            <div className="flex flex-wrap gap-2">
+              {["Review pending", "View missing docs", "Verify documents", "Upload document"].map((action, index) => (
+                <Button
+                  className={index === 0 ? "border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" : "border-white/[0.10] bg-white/[0.08] text-white hover:bg-white/[0.14]"}
+                  key={action}
+                  size="sm"
+                  variant={index === 0 ? "primary" : "secondary"}
+                >
+                  {action}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[1fr_0.8fr]">
+            <div className="grid gap-3 md:grid-cols-3">
+              {[
+                ["Missing documents", "4 customers missing Emirates ID", "2 missing passport · 3 missing driving license", "border-rose-300/30 bg-rose-500/10"],
+                ["Expiring documents", "5 visit visas expiring in 7 days", "2 licenses expiring this month", "border-amber-300/30 bg-amber-500/10"],
+                ["Pending verification", "8 uploaded today", "3 waiting for manual verification", "border-[#31C7B7]/30 bg-[#31C7B7]/10"],
+              ].map(([title, primary, secondary, className]) => (
+                <div className={cn("rounded-2xl border p-4", className)} key={title}>
+                  <p className="text-sm font-semibold text-white">{title}</p>
+                  <p className="mt-3 text-lg font-semibold tracking-[-0.03em] text-white">{primary}</p>
+                  <p className="mt-2 text-sm leading-5 text-white/[0.68]">{secondary}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-white">Recent uploads</p>
+                <span className="text-xs font-semibold text-[#31C7B7]">Live</span>
               </div>
-            ))}
+              <div className="mt-3 space-y-3">
+                {recentUploads.map((document) => {
+                  const customer = getCustomer(document.customerId);
+                  return (
+                    <div className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.06] p-3" key={document.id}>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-white">{customer.name}</p>
+                        <p className="mt-1 text-xs text-white/[0.62]">{document.type} · {document.source}</p>
+                      </div>
+                      <p className="shrink-0 text-xs font-medium text-white/[0.62]">{document.updatedAt}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </CardBody>
       </Card>
