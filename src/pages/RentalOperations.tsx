@@ -2625,16 +2625,86 @@ function SettingsView() {
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
-        <CardBody className="flex flex-col gap-4 p-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Settings</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.055em]">Dreamz operational control center</h2>
-            <p className="mt-2 text-sm text-white/[0.68]">
-              Manage access, rules, security, notifications, integrations, and version history.
-            </p>
+      <Card className="overflow-hidden border-white bg-white shadow-[0_18px_60px_rgba(8,27,51,0.08)]">
+        <CardBody className="space-y-4 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Settings</p>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">
+                Business rules & operational defaults
+              </h2>
+            </div>
+            <Button variant="primary">Save rule changes</Button>
           </div>
-          <Badge className="border-white/[0.10] bg-white/[0.08] text-white">Boss controls protected</Badge>
+
+          <div className="grid gap-4 xl:grid-cols-4">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <CreditCard aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                <h3 className="text-sm font-semibold tracking-[-0.02em] text-[#081B33]">Business Rules</h3>
+              </div>
+              <div className="space-y-2">
+                {businessRules.map(([label, value]) => (
+                  <div className="rounded-xl border border-studio-line bg-[#F8FAFC] p-2.5" key={label}>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-studio-soft">{label}</p>
+                    <input className={cn(editFieldClass, "mt-1.5 h-8")} defaultValue={value} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <Activity aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                <h3 className="text-sm font-semibold tracking-[-0.02em] text-[#081B33]">Operational Defaults</h3>
+              </div>
+              <div className="space-y-2">
+                {operationalDefaults.map(([label, value]) => {
+                  const isToggle = value === "On" || value === "Off";
+                  return (
+                    <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-[#F8FAFC] p-2.5" key={label}>
+                      <p className="text-sm font-medium text-[#081B33]">{label}</p>
+                      {isToggle ? (
+                        <Toggle enabled={value === "On"} />
+                      ) : (
+                        <input className={cn(editFieldClass, "h-8 w-24 text-right")} defaultValue={value} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <ShieldCheck aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                <h3 className="text-sm font-semibold tracking-[-0.02em] text-[#081B33]">Approval Rules</h3>
+              </div>
+              <div className="space-y-2">
+                {approvalRules.map(([label, value]) => (
+                  <div className="rounded-xl border border-studio-line bg-[#F8FAFC] p-2.5" key={label}>
+                    <p className="text-sm font-semibold text-[#081B33]">{label}</p>
+                    <input className={cn(editFieldClass, "mt-1.5 h-8")} defaultValue={value} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <Wrench aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                <h3 className="text-sm font-semibold tracking-[-0.02em] text-[#081B33]">System Preferences</h3>
+              </div>
+              <div className="space-y-2">
+                {systemPreferences.map(([label, value]) => (
+                  <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-[#F8FAFC] p-2.5" key={label}>
+                    <p className="text-sm font-medium text-[#081B33]">{label}</p>
+                    <Toggle enabled={value === "On"} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </CardBody>
       </Card>
 
@@ -2716,88 +2786,6 @@ function SettingsView() {
           ]}
         />
       </div>
-
-      <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
-        <CardHeader>
-          <SectionHeading
-            action={<Button variant="primary">Save rule changes</Button>}
-            eyebrow="Rules"
-            title="Business Rules & Operational Defaults"
-          />
-        </CardHeader>
-        <CardBody className="grid gap-5 xl:grid-cols-2">
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <CreditCard aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
-              <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Business Rules</h3>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {businessRules.map(([label, value]) => (
-                <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={label}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft">{label}</p>
-                  <input className={cn(editFieldClass, "mt-2")} defaultValue={value} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-5">
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <Activity aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
-                <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Operational Defaults</h3>
-              </div>
-              <div className="space-y-2">
-                {operationalDefaults.map(([label, value]) => {
-                  const isToggle = value === "On" || value === "Off";
-                  return (
-                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={label}>
-                      <p className="text-sm font-medium text-[#081B33]">{label}</p>
-                      {isToggle ? (
-                        <Toggle enabled={value === "On"} />
-                      ) : (
-                        <input className={cn(editFieldClass, "w-28 text-right")} defaultValue={value} />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <div>
-                <div className="mb-3 flex items-center gap-2">
-                  <ShieldCheck aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
-                  <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Approval Rules</h3>
-                </div>
-                <div className="space-y-2">
-                  {approvalRules.map(([label, value]) => (
-                    <div className="rounded-2xl border border-studio-line bg-white p-3" key={label}>
-                      <p className="text-sm font-semibold text-[#081B33]">{label}</p>
-                      <p className="mt-1 text-xs text-studio-muted">{value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="mb-3 flex items-center gap-2">
-                  <Wrench aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
-                  <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">System Preferences</h3>
-                </div>
-                <div className="space-y-2">
-                  {systemPreferences.map(([label, value]) => (
-                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-studio-line bg-white p-3" key={label}>
-                      <p className="text-sm font-medium text-[#081B33]">{label}</p>
-                      <Toggle enabled={value === "On"} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
 
       <Card>
         <CardHeader>
