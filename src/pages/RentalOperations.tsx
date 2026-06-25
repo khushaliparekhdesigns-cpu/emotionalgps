@@ -88,8 +88,11 @@ const statusStyles: Record<string, string> = {
   "Balance pending": "border-amber-200 bg-amber-50 text-amber-700",
   "Fully paid": "border-emerald-200 bg-emerald-50 text-emerald-700",
   Verified: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  Received: "border-sky-200 bg-sky-50 text-sky-700",
+  "Pending verification": "border-amber-200 bg-amber-50 text-amber-700",
   "Needs review": "border-amber-200 bg-amber-50 text-amber-700",
   Expiring: "border-orange-200 bg-orange-50 text-orange-700",
+  Expired: "border-rose-200 bg-rose-50 text-rose-700",
   Missing: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
@@ -1138,6 +1141,12 @@ function InboxView() {
                           <FileText aria-hidden="true" className="h-3.5 w-3.5 text-[#31C7B7]" />
                           Emirates ID.pdf
                         </span>
+                        <button
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-[#31C7B7]/30 bg-[#E7FAF7] px-2.5 py-1 text-xs font-semibold text-[#087A70]"
+                          type="button"
+                        >
+                          Save to Documents
+                        </button>
                       </div>
                     ) : null}
                   </div>
@@ -2360,46 +2369,142 @@ function RankingCard({
 }
 
 function DocumentsView() {
-  const needsAttention = documents.filter((document) => document.status !== "Verified").length;
+  const missingDocs = documents.filter((document) => document.status === "Missing").length;
+  const pendingVerification = documents.filter((document) => document.status === "Pending verification").length;
+  const expiringSoon = documents.filter((document) => document.expiryDate.includes("Expires")).length;
+  const verifiedDocs = documents.filter((document) => document.status === "Verified").length;
+  const quickFilters = [
+    ["Missing docs", missingDocs],
+    ["Expiring soon", expiringSoon],
+    ["Pending verification", pendingVerification],
+    ["Agreements", documents.filter((document) => document.type === "Rental agreement").length],
+    ["Invoices", documents.filter((document) => document.type === "Invoice").length],
+    ["Damage reports", documents.filter((document) => document.type === "Damage report").length],
+  ];
 
   return (
     <div className="space-y-6">
+      <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
+        <CardBody className="grid gap-5 p-5 xl:grid-cols-[1.1fr_0.9fr] xl:items-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Verification vault</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.055em]">
+              Legal memory for customer IDs, contracts, invoices and vehicle condition.
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-white/[0.70]">
+              Primary flow: open a WhatsApp attachment in Unified Inbox, click "Save to Documents", and the file is linked to the customer profile automatically.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              ["Verified", verifiedDocs],
+              ["Pending", pendingVerification],
+              ["Missing", missingDocs],
+            ].map(([label, value]) => (
+              <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4" key={String(label)}>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/[0.55]">{label}</p>
+                <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{value}</p>
+              </div>
+            ))}
+          </div>
+        </CardBody>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-3">
-        <MiniMetric icon={ShieldCheck} label="Verified documents" value={String(documents.length - needsAttention)} helper="Ready for rentals" />
-        <MiniMetric icon={AlertCircle} label="Need review" value={String(needsAttention)} helper="Expiring, missing, or unchecked" />
-        <MiniMetric icon={FileText} label="Rental agreements" value="14" helper="8 signed this week" />
+        <MiniMetric icon={ShieldCheck} label="Verified documents" value={String(verifiedDocs)} helper="Ready for rentals" />
+        <MiniMetric icon={AlertCircle} label="Pending verification" value={String(pendingVerification)} helper="Needs staff check" />
+        <MiniMetric icon={FileText} label="Expiring soon" value={String(expiringSoon)} helper="Renew before dispatch" />
       </div>
+
+      <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+        <CardBody className="flex flex-col gap-4 p-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {quickFilters.map(([label, count], index) => (
+              <button
+                className={cn(
+                  "rounded-full border px-3 py-2 text-xs font-semibold transition",
+                  index === 0
+                    ? "border-[#31C7B7] bg-[#E7FAF7] text-[#087A70]"
+                    : "border-studio-line bg-white text-studio-muted hover:text-[#081B33]",
+                )}
+                key={String(label)}
+                type="button"
+              >
+                {label} <span className="ml-1 opacity-70">{count}</span>
+              </button>
+            ))}
+          </div>
+          <Button variant="primary">
+            <FileText aria-hidden="true" className="h-4 w-4" />
+            Upload document
+          </Button>
+        </CardBody>
+      </Card>
+
+      <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+        <CardHeader>
+          <SectionHeading eyebrow="Manual upload" title="Capture files into the vault" />
+        </CardHeader>
+        <CardBody className="grid gap-3 md:grid-cols-3">
+          {[
+            ["Camera upload", "Damage photos, odometer, fuel photos"],
+            ["Gallery upload", "Customer ID photos, signed papers"],
+            ["PDF upload", "Invoices, rental contracts, receipts"],
+          ].map(([title, detail]) => (
+            <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-4" key={title}>
+              <p className="text-sm font-semibold text-[#081B33]">{title}</p>
+              <p className="mt-2 text-sm leading-5 text-studio-muted">{detail}</p>
+              <p className="mt-3 text-xs font-semibold text-[#087A70]">Attach to customer profile</p>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
 
       <Card>
         <CardHeader>
           <SectionHeading
-            action={<Button variant="primary">Upload document</Button>}
-            eyebrow="Document control"
-            title="Customer documents"
+            eyebrow="Document table"
+            title="Customer verification and operational paper trail"
           />
         </CardHeader>
-        <CardBody className="space-y-3">
+        <CardBody className="space-y-2">
+          <div className="hidden grid-cols-[1.2fr_0.8fr_0.65fr_0.8fr_0.75fr_0.75fr] gap-3 rounded-2xl bg-[#F8FAFC] px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft lg:grid">
+            <span>Customer</span>
+            <span>Document type</span>
+            <span>Source</span>
+            <span>Status</span>
+            <span>Expiry date</span>
+            <span>Last updated</span>
+          </div>
           {documents.slice(0, 24).map((document) => {
             const customer = getCustomer(document.customerId);
             return (
               <div
-                className="grid gap-3 rounded-2xl border border-studio-line bg-white p-4 shadow-sm md:grid-cols-[1.4fr_0.8fr_0.8fr_0.7fr]"
+                className="grid gap-3 rounded-2xl border border-studio-line bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.8fr_0.65fr_0.8fr_0.75fr_0.75fr] lg:items-center"
                 key={document.id}
               >
                 <div>
-                  <p className="font-medium text-studio-ink">{document.title}</p>
-                  <p className="mt-1 text-sm text-studio-muted">{customer.email}</p>
+                  <p className="font-medium text-[#081B33]">{customer.name}</p>
+                  <p className="mt-1 text-xs text-studio-muted">{customer.email}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-studio-soft">Type</p>
-                  <p className="mt-1 text-sm text-studio-ink">{document.type}</p>
+                  <p className="text-xs text-studio-soft lg:hidden">Type</p>
+                  <p className="mt-1 text-sm font-medium text-[#081B33] lg:mt-0">{document.type}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-studio-soft">Updated</p>
-                  <p className="mt-1 text-sm text-studio-ink">{document.updatedAt}</p>
+                  <p className="text-xs text-studio-soft lg:hidden">Source</p>
+                  <p className="mt-1 text-sm text-studio-muted lg:mt-0">{document.source}</p>
                 </div>
-                <div className="flex items-center md:justify-end">
+                <div>
                   <StatusPill value={document.status} />
+                </div>
+                <div>
+                  <p className="text-xs text-studio-soft lg:hidden">Expiry</p>
+                  <p className="mt-1 text-sm text-studio-muted lg:mt-0">{document.expiryDate}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-studio-soft lg:hidden">Updated</p>
+                  <p className="mt-1 text-sm text-studio-muted lg:mt-0">{document.updatedAt}</p>
                 </div>
               </div>
             );

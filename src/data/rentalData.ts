@@ -113,13 +113,17 @@ export type DocumentRecord = {
   type:
     | "Passport"
     | "Emirates ID"
-    | "Visit visa"
-    | "UAE driving licence"
-    | "International driving licence"
-    | "Agreement"
-    | "Insurance"
-    | "Deposit";
-  status: "Verified" | "Needs review" | "Expiring" | "Missing";
+    | "Driving license"
+    | "Visa"
+    | "Rental agreement"
+    | "Invoice"
+    | "Deposit receipt"
+    | "Fine receipt"
+    | "Damage report"
+    | "Return inspection";
+  source: "WhatsApp" | "Upload" | "Email";
+  status: "Received" | "Pending verification" | "Verified" | "Missing" | "Expired";
+  expiryDate: string;
   updatedAt: string;
 };
 
@@ -440,19 +444,34 @@ export const documents: DocumentRecord[] = Array.from({ length: 42 }, (_, index)
   id: `doc-${index + 1}`,
   customerId: customers[(index * 2) % customers.length].id,
   title: `${customers[(index * 2) % customers.length].name} · ${
-    ["Passport", "Emirates ID", "Visit visa", "UAE driving licence", "Deposit receipt", "Rental agreement"][index % 6]
+    [
+      "Passport",
+      "Emirates ID",
+      "Driving license",
+      "Visa",
+      "Rental agreement",
+      "Invoice",
+      "Deposit receipt",
+      "Fine receipt",
+      "Damage report",
+      "Return inspection",
+    ][index % 10]
   }`,
   type: [
     "Passport",
     "Emirates ID",
-    "Visit visa",
-    "UAE driving licence",
-    "International driving licence",
-    "Deposit",
-    "Agreement",
-    "Insurance",
-  ][index % 8] as DocumentRecord["type"],
-  status: ["Verified", "Needs review", "Expiring", "Missing"][index % 4] as DocumentRecord["status"],
+    "Driving license",
+    "Visa",
+    "Rental agreement",
+    "Invoice",
+    "Deposit receipt",
+    "Fine receipt",
+    "Damage report",
+    "Return inspection",
+  ][index % 10] as DocumentRecord["type"],
+  source: ["WhatsApp", "Upload", "Email"][index % 3] as DocumentRecord["source"],
+  status: ["Received", "Pending verification", "Verified", "Missing", "Expired"][index % 5] as DocumentRecord["status"],
+  expiryDate: ["20 Jun 2027", "18 Dec 2026", "Expires in 12 days", "No expiry", "Expired 04 Jun"][index % 5],
   updatedAt: `${["Today", "Yesterday", "18 Jun", "16 Jun", "12 Jun"][index % 5]} · ${
     ["09:20", "11:45", "13:10", "15:30"][index % 4]
   }`,
