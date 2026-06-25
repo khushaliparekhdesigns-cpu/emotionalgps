@@ -26,6 +26,7 @@ import {
   IconShieldCheck as ShieldCheck,
   IconSparkles as Sparkles,
   IconStar as Star,
+  IconPaperclip as Paperclip,
   IconPhoto as Photo,
   IconTrendingUp as TrendingUp,
   IconUserCircle as UserRound,
@@ -1074,6 +1075,14 @@ function InboxView() {
                   className="border-transparent bg-[#F8FAFC]"
                   placeholder={`Reply to ${customer.name}...`}
                 />
+                <Button className="h-10 w-10 shrink-0 rounded-xl p-0" variant="secondary">
+                  <Paperclip aria-hidden="true" className="h-4 w-4" />
+                  <span className="sr-only">Add attachment</span>
+                </Button>
+                <Button className="h-10 w-10 shrink-0 rounded-xl p-0" variant="secondary">
+                  <Photo aria-hidden="true" className="h-4 w-4" />
+                  <span className="sr-only">Add image</span>
+                </Button>
                 <Button className="h-10 w-10 shrink-0 rounded-xl p-0" variant="primary">
                   <Send aria-hidden="true" className="h-4 w-4" />
                 </Button>
@@ -1804,7 +1813,7 @@ function HeroQuestionBar() {
               Ask the operation anything
             </div>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/[0.84]">
-              Try: "Which SUVs are available today?", "Who has not replied to VIP customers?", or "Where is every delivered vehicle?"
+              Try: "Search for whose payment is pending", "Which SUVs are available today?", "Who has not replied to customers?", or "Show today's DXB pickups."
             </p>
           </div>
           <Button className="border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" variant="primary">
