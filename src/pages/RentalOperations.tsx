@@ -1985,23 +1985,105 @@ function BookingsView() {
 }
 
 function AnalyticsView() {
-  const topVehicles = [...vehicles].sort((a, b) => b.revenue - a.revenue).slice(0, 6);
-  const lowUtilisation = [...vehicles].sort((a, b) => a.utilisation - b.utilisation).slice(0, 5);
+  const b2bVehicles = vehicles.filter((vehicle) => vehicle.bookingType === "B2B");
+  const b2cVehicles = vehicles.filter((vehicle) => vehicle.bookingType === "B2C");
+  const b2bRevenue = b2bVehicles.reduce((total, vehicle) => total + vehicle.revenue, 0);
+  const b2cRevenue = b2cVehicles.reduce((total, vehicle) => total + vehicle.revenue, 0);
+  const totalRevenue = b2bRevenue + b2cRevenue;
+  const b2bShare = Math.round((b2bRevenue / totalRevenue) * 100);
+  const b2cShare = 100 - b2bShare;
+  const b2bBookings = bookings.filter((booking) => booking.bookingType === "B2B").length;
+  const b2cBookings = bookings.filter((booking) => booking.bookingType === "B2C").length;
+  const topBookedCars = [...vehicles]
+    .map((vehicle, index) => ({
+      ...vehicle,
+      bookingsCount: 8 + ((index * 3) % 17),
+    }))
+    .sort((a, b) => b.bookingsCount - a.bookingsCount)
+    .slice(0, 6);
+  const lowestPerformers = [...vehicles]
+    .map((vehicle, index) => ({
+      ...vehicle,
+      bookingsCount: 1 + (index % 4),
+      idleDays: Number(vehicle.idleTime.match(/\d+/)?.[0] ?? (index % 5) + 1),
+    }))
+    .sort((a, b) => a.utilisation - b.utilisation || a.revenue - b.revenue)
+    .slice(0, 5);
+  const categoryDemand = ["Luxury sedan", "Luxury SUV", "Convertible", "Family vehicle", "Economy SUV", "Economy sedan"].map((category) => {
+    const categoryVehicles = vehicles.filter((vehicle) => vehicle.class === category);
+    const revenue = categoryVehicles.reduce((total, vehicle) => total + vehicle.revenue, 0);
+    const utilisation =
+      categoryVehicles.length > 0
+        ? Math.round(categoryVehicles.reduce((total, vehicle) => total + vehicle.utilisation, 0) / categoryVehicles.length)
+        : 0;
+
+    return {
+      category,
+      bookings: categoryVehicles.length * 4 + (category.length % 7),
+      revenue,
+      utilisation,
+    };
+  });
   const topCustomers = [...customers].sort((a, b) => b.lifetimeSpend - a.lifetimeSpend).slice(0, 5);
+  const repeatCustomers = Math.round((customers.filter((customer) => customer.previousBookings.length > 2).length / customers.length) * 100);
+  const averageSpend = Math.round(customers.reduce((total, customer) => total + customer.lifetimeSpend, 0) / customers.length);
 
   return (
     <div className="space-y-6">
+      <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
+        <CardBody className="p-5">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Revenue source</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-[-0.06em]">B2B vs B2C revenue split</h2>
+              <p className="mt-2 text-sm text-white/[0.68]">This month, compared with last month.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:w-[560px]">
+              <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4">
+                <p className="text-sm font-semibold text-white/[0.72]">B2B revenue</p>
+                <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{formatCurrency(b2bRevenue)}</p>
+                <p className="mt-1 text-sm text-[#31C7B7]">{b2bShare}% split · +12% vs last month</p>
+              </div>
+              <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-4">
+                <p className="text-sm font-semibold text-white/[0.72]">B2C revenue</p>
+                <p className="mt-2 text-3xl font-semibold tracking-[-0.06em]">{formatCurrency(b2cRevenue)}</p>
+                <p className="mt-1 text-sm text-[#31C7B7]">{b2cShare}% split · +18% vs last month</p>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-4">
-        <MiniMetric icon={CircleDollarSign} label="Month revenue" value={formatCurrency(312000)} helper="+9.1% month over month" />
-        <MiniMetric icon={LineChart} label="Booking trend" value="119" helper="11 more bookings than May" />
-        <MiniMetric icon={Car} label="Most requested" value="Nissan Patrol" helper="28 requests this month" />
-        <MiniMetric icon={Clock3} label="Avg duration" value="2.8d" helper="Luxury SUV rentals average 3.4d" />
+        <MiniMetric icon={CircleDollarSign} label="B2B bookings" value={String(b2bBookings)} helper="Fewer bookings, higher locked utilisation" />
+        <MiniMetric icon={LineChart} label="B2C bookings" value={String(b2cBookings)} helper="Growing faster on weekends" />
+        <MiniMetric icon={Clock3} label="Avg duration" value="2.8d" helper="B2B average is 21.4d" />
+        <MiniMetric icon={UsersRound} label="Repeat customers" value={`${repeatCustomers}%`} helper="Customers with 3+ previous rentals" />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <Card>
           <CardHeader>
-            <SectionHeading eyebrow="Revenue" title="Revenue by month" />
+            <SectionHeading
+              action={
+                <div className="flex flex-wrap gap-2">
+                  {["All", "B2B only", "B2C only", "By category"].map((filter) => (
+                    <button
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-xs font-semibold",
+                        filter === "All" ? "border-[#31C7B7] bg-[#E7FAF7] text-[#087A70]" : "border-studio-line bg-white text-studio-muted",
+                      )}
+                      key={filter}
+                      type="button"
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              }
+              eyebrow="Revenue"
+              title="Revenue by month"
+            />
           </CardHeader>
           <CardBody>
             <SparklineBars values={revenueByMonth.map((item) => item.revenue)} />
@@ -2015,13 +2097,14 @@ function AnalyticsView() {
 
         <Card>
           <CardHeader>
-            <SectionHeading eyebrow="Insights" title="Booking trends" />
+            <SectionHeading eyebrow="Booking trends" title="Daily, weekly, monthly movement" />
           </CardHeader>
           <CardBody className="space-y-4">
             {[
-              ["SUV demand", "64% of inbound enquiries mention Nissan Patrol, Escalade, Yukon, or Range Rover Velar."],
-              ["Airport growth", "DXB and hotel delivery requests are up 22% this month."],
-              ["No-deposit offers", "No-deposit bookings convert faster when WhatsApp replies include requirements early."],
+              ["Daily bookings", "Peak days are Friday and Saturday, with 31% more B2C demand."],
+              ["Weekly bookings", "Weekly bookings are up 14%, led by SUVs and family vehicles."],
+              ["Monthly bookings", "Monthly B2B leases are stable, with 8 active corporate allocations."],
+              ["Cancellations", "7 cancellations this month, mostly document/payment delays."],
             ].map(([title, detail]) => (
               <div className="rounded-2xl border border-studio-line bg-studio-panel p-4" key={title}>
                 <p className="font-medium text-studio-ink">{title}</p>
@@ -2032,25 +2115,136 @@ function AnalyticsView() {
         </Card>
       </div>
 
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Top booked cars this month</h3>
+          </CardHeader>
+          <CardBody className="space-y-3">
+            {topBookedCars.map((vehicle, index) => (
+              <div className="grid gap-3 rounded-xl border border-studio-line bg-white p-3 md:grid-cols-[1fr_0.5fr_0.8fr_0.5fr]" key={vehicle.id}>
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-studio-panel text-xs font-semibold text-studio-muted">{index + 1}</div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-[#081B33]">{vehicle.model}</p>
+                    <p className="mt-1 text-xs text-studio-muted">{vehicle.bookingType} · {vehicle.plate}</p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold text-[#081B33]">{vehicle.bookingsCount} bookings</p>
+                <p className="text-sm font-semibold text-[#081B33]">{formatCurrency(vehicle.revenue)}</p>
+                <p className="text-sm font-semibold text-[#081B33]">{vehicle.utilisation}%</p>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Lowest performing cars</h3>
+          </CardHeader>
+          <CardBody className="space-y-3">
+            {lowestPerformers.map((vehicle) => (
+              <div className="grid gap-3 rounded-xl border border-studio-line bg-white p-3 md:grid-cols-[1fr_0.45fr_0.8fr_0.45fr]" key={vehicle.id}>
+                <div>
+                  <p className="text-sm font-semibold text-[#081B33]">{vehicle.model}</p>
+                  <p className="mt-1 text-xs text-amber-700">Idle {vehicle.idleDays} days</p>
+                </div>
+                <p className="text-sm font-semibold text-[#081B33]">{vehicle.bookingsCount} bookings</p>
+                <p className="text-sm font-semibold text-[#081B33]">{formatCurrency(vehicle.revenue)}</p>
+                <p className="text-sm font-semibold text-[#081B33]">{vehicle.utilisation}%</p>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <SectionHeading eyebrow="Category demand" title="Performance by category" />
+        </CardHeader>
+        <CardBody className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          {categoryDemand.map((item) => (
+            <div className="rounded-2xl border border-studio-line bg-white p-4" key={item.category}>
+              <p className="text-sm font-semibold text-[#081B33]">{item.category}</p>
+              <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-studio-soft">Bookings</p>
+                  <p className="mt-1 font-semibold text-[#081B33]">{item.bookings}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-studio-soft">Utilisation</p>
+                  <p className="mt-1 font-semibold text-[#081B33]">{item.utilisation}%</p>
+                </div>
+                <div>
+                  <p className="text-xs text-studio-soft">Revenue</p>
+                  <p className="mt-1 font-semibold text-[#081B33]">{formatCurrency(item.revenue)}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
+
       <div className="grid gap-6 xl:grid-cols-3">
-        <RankingCard title="Highest earning cars" items={topVehicles.map((vehicle) => ({
-          label: vehicle.model,
-          meta: vehicle.plate,
-          value: formatCurrency(vehicle.revenue),
-        }))} />
-        <RankingCard title="Lowest utilisation" items={lowUtilisation.map((vehicle) => ({
-          label: vehicle.model,
-          meta: vehicle.location,
-          value: `${vehicle.utilisation}%`,
-        }))} />
         <RankingCard title="Top customers" items={topCustomers.map((customer) => ({
           label: customer.name,
           meta: customer.tier,
           value: formatCurrency(customer.lifetimeSpend),
         }))} />
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Customer insights</h3>
+          </CardHeader>
+          <CardBody className="space-y-3">
+            {[
+              ["Repeat customers", `${repeatCustomers}%`],
+              ["Average spend/customer", formatCurrency(averageSpend)],
+              ["Average booking duration", "2.8 days"],
+            ].map(([label, value]) => (
+              <div className="flex items-center justify-between rounded-xl border border-studio-line bg-white p-3" key={label}>
+                <p className="text-sm text-studio-muted">{label}</p>
+                <p className="text-sm font-semibold text-[#081B33]">{value}</p>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Underutilised alerts</h3>
+          </CardHeader>
+          <CardBody className="space-y-3">
+            {lowestPerformers.slice(0, 4).map((vehicle) => (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3" key={vehicle.id}>
+                <p className="text-sm font-semibold text-amber-900">{vehicle.model}</p>
+                <p className="mt-1 text-xs text-amber-800">Idle {vehicle.idleDays} days · Push in sales queue</p>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
       </div>
 
-      <AiConceptStrip />
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Bot aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+            <h2 className="font-semibold tracking-[-0.03em] text-[#081B33]">Trend insights</h2>
+          </div>
+        </CardHeader>
+        <CardBody className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {[
+            ["SUV demand up 18%", "Nissan Patrol, Escalade and Yukon are leading enquiries."],
+            ["Convertibles slow", "BMW 420i has fewer weekend bookings this month."],
+            ["Airport pickups increased", "DXB pickup requests are up 22%."],
+            ["Weekends stronger", "B2C weekend bookings outperform weekdays by 31%."],
+            ["B2C growing faster", "B2C revenue grew 18% vs 12% for B2B."],
+          ].map(([title, detail]) => (
+            <div className="rounded-2xl border border-studio-line bg-white p-4" key={title}>
+              <p className="text-sm font-semibold text-[#081B33]">{title}</p>
+              <p className="mt-2 text-sm leading-5 text-studio-muted">{detail}</p>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
     </div>
   );
 }
