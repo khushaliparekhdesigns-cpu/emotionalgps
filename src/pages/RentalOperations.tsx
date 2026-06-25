@@ -13,6 +13,7 @@ import {
   IconClock as Clock3,
   IconCreditCard as CreditCard,
   IconFileText as FileText,
+  IconFileInvoice as FileInvoice,
   IconFilter as Filter,
   IconInbox as Inbox,
   IconKey as KeyRound,
@@ -26,6 +27,17 @@ import {
   IconShieldCheck as ShieldCheck,
   IconSparkles as Sparkles,
   IconStar as Star,
+  IconPaperclip as Paperclip,
+  IconPhoto as Photo,
+  IconFileTypePdf as FilePdf,
+  IconId as IdCard,
+  IconMicrophone as Microphone,
+  IconMessagePlus as MessagePlus,
+  IconUserCheck as UserCheck,
+  IconFlag as Flag,
+  IconChecks as Checks,
+  IconNotes as Notes,
+  IconTemplate as Template,
   IconTrendingUp as TrendingUp,
   IconUserCircle as UserRound,
   IconUsers as UsersRound,
@@ -258,6 +270,55 @@ const connectedChannels: {
   { label: "Website enquiries", status: "Live", icon: Inbox },
   { label: "Google Ads", status: "Importing leads", icon: Search },
   { label: "Meta Ads", status: "Importing leads", icon: TrendingUp },
+];
+
+const inboxQueues = [
+  { label: "All", count: 36 },
+  { label: "Mine", count: 8 },
+  { label: "Unassigned", count: 7 },
+  { label: "VIP", count: 6 },
+  { label: "Urgent", count: 5 },
+  { label: "Awaiting Reply", count: 12 },
+  { label: "New Leads", count: 11 },
+  { label: "Existing", count: 14 },
+];
+
+const inboxAiPrompts = [
+  "Which VIP customers are waiting?",
+  "Who has pending payment?",
+  "Show all airport pickups today",
+  "Which cars have enquiries but are still unassigned?",
+];
+
+const inboxAttachments = [
+  { label: "Passport scan", type: "PDF", icon: FilePdf, status: "Received" },
+  { label: "Emirates ID front", type: "Image", icon: IdCard, status: "Verified" },
+  { label: "Payment screenshot", type: "Image", icon: Photo, status: "Needs finance" },
+  { label: "Rental contract", type: "PDF", icon: FileText, status: "Unsigned" },
+];
+
+const inboxQuickActions = [
+  { label: "New chat", icon: MessagePlus },
+  { label: "New booking", icon: CalendarDays },
+  { label: "Send quote", icon: FileInvoice },
+  { label: "Upload invoice", icon: Paperclip },
+  { label: "Upload contract", icon: FileText },
+];
+
+const inboxQuickReplies = [
+  "Share AED quote",
+  "Request Emirates ID",
+  "Send payment link",
+  "Confirm delivery slot",
+];
+
+const inboxTimeline = [
+  { label: "Inquiry created", time: "08:41", status: "Done" },
+  { label: "Quote sent", time: "08:48", status: "Done" },
+  { label: "Docs received", time: "09:02", status: "Partial" },
+  { label: "Payment made", time: "Pending", status: "Open" },
+  { label: "Car delivered", time: "Today 16:00", status: "Upcoming" },
+  { label: "Car returned", time: "Tomorrow 12:00", status: "Upcoming" },
 ];
 
 function StatusPill({ value }: { value: string }) {
@@ -834,22 +895,28 @@ function DashboardView() {
 function ConversationListItem({
   active,
   conversation,
+  index,
   onClick,
 }: {
   active: boolean;
   conversation: Conversation;
+  index: number;
   onClick: () => void;
 }) {
   const customer = getCustomer(conversation.customerId);
   const SourceIcon = sourceIcons[conversation.source];
+  const unreadCount = [3, 0, 1, 5, 2, 0][index % 6];
+  const urgent = conversation.status === "Awaiting reply" || conversation.waitingMinutes > 120;
 
   return (
     <button
       className={cn(
-        "w-full rounded-2xl border p-4 text-left transition duration-200",
+        "w-full rounded-2xl border p-3 text-left transition duration-200",
         active
-          ? "border-studio-purple/30 bg-studio-purple-soft/70 shadow-sm"
-          : "border-studio-line bg-white hover:-translate-y-0.5 hover:border-studio-soft/60",
+          ? "border-[#31C7B7]/40 bg-[#E7FAF7] shadow-sm"
+          : urgent
+            ? "border-amber-200 bg-amber-50/40 hover:border-amber-300"
+            : "border-studio-line bg-white hover:-translate-y-0.5 hover:border-studio-soft/60",
       )}
       onClick={onClick}
       type="button"
@@ -857,17 +924,34 @@ function ConversationListItem({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <SourceIcon aria-hidden="true" className="h-4 w-4 text-studio-muted" />
-            <p className="truncate text-sm font-semibold text-studio-ink">{customer.name}</p>
+            <SourceIcon aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+            <p className="truncate text-sm font-semibold text-[#081B33]">{customer.name}</p>
+            {customer.tier === "VIP" ? <Star aria-hidden="true" className="h-3.5 w-3.5 text-amber-500" /> : null}
           </div>
           <p className="mt-2 line-clamp-2 text-sm leading-5 text-studio-muted">{conversation.lastMessage}</p>
         </div>
-        <StatusPill value={conversation.status} />
+        {unreadCount > 0 ? (
+          <span className="grid h-6 min-w-6 place-items-center rounded-full bg-[#081B33] px-1.5 text-xs font-semibold text-white">
+            {unreadCount}
+          </span>
+        ) : null}
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
         <Badge>{conversation.source}</Badge>
-        <Badge>{conversation.stage}</Badge>
-        <span className="text-xs text-studio-soft">{conversation.waitingMinutes}m waiting</span>
+        {conversation.tags.slice(0, 3).map((tag) => (
+          <Badge className="px-2 py-0.5" key={tag}>{tag}</Badge>
+        ))}
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2">
+          <StatusPill value={conversation.status} />
+          <span className={cn("font-semibold", urgent ? "text-amber-700" : "text-studio-soft")}>
+            {conversation.waitingMinutes}m waiting
+          </span>
+        </div>
+        <span className={cn("font-medium", conversation.assignedTo === "Unassigned" ? "text-rose-600" : "text-studio-muted")}>
+          {conversation.assignedTo}
+        </span>
       </div>
     </button>
   );
@@ -875,143 +959,472 @@ function ConversationListItem({
 
 function InboxView() {
   const [selectedId, setSelectedId] = useState(conversations[0].id);
-  const [assignedToMe, setAssignedToMe] = useState(false);
+  const [activeQueue, setActiveQueue] = useState("All");
+  const [activeChannel, setActiveChannel] = useState<"WhatsApp" | "Email">("WhatsApp");
+  const [composerMode, setComposerMode] = useState<"Reply" | "Internal note">("Reply");
   const selected = conversations.find((conversation) => conversation.id === selectedId) ?? conversations[0];
   const customer = getCustomer(selected.customerId);
-  const visibleConversations = assignedToMe
-    ? conversations.filter((conversation) => conversation.assignedTo === "Amelia" || conversation.id === selectedId)
-    : conversations;
+  const currentBookings = bookings.filter((booking) => booking.customerId === customer.id).slice(0, 2);
+  const visibleConversations = conversations.filter((conversation) => {
+    const conversationCustomer = getCustomer(conversation.customerId);
+
+    if (conversation.id === selectedId) {
+      return true;
+    }
+
+    if (activeQueue === "Mine") {
+      return conversation.assignedTo === "Amelia";
+    }
+
+    if (activeQueue === "Unassigned") {
+      return conversation.assignedTo === "Unassigned";
+    }
+
+    if (activeQueue === "VIP") {
+      return conversationCustomer.tier === "VIP";
+    }
+
+    if (activeQueue === "Urgent") {
+      return conversation.waitingMinutes > 90 || conversation.status === "Awaiting reply";
+    }
+
+    if (activeQueue === "Awaiting Reply") {
+      return conversation.status === "Awaiting reply";
+    }
+
+    if (activeQueue === "New Leads") {
+      return conversation.stage === "New enquiry" || conversation.source.includes("Ads") || conversation.source === "Website";
+    }
+
+    if (activeQueue === "Existing") {
+      return conversationCustomer.previousBookings.length > 1;
+    }
+
+    return true;
+  });
+  const customerState = ["Awaiting reply", "Quote sent", "Payment pending", "Confirmed", "Delivered"];
+  const intelligenceCards = [
+    ["Customer since", customer.since],
+    ["Past rentals", String(customer.previousBookings.length)],
+    ["Average spend", formatCurrency(Math.round(customer.lifetimeSpend / Math.max(customer.previousBookings.length, 1)))],
+    ["Deposit history", "2 held, 0 disputes"],
+    ["Open bookings", String(currentBookings.length || 1)],
+    ["Documents uploaded", "Passport, Emirates ID"],
+    ["Payment status", selected.stage === "Payment" ? "Pending" : "Deposit only"],
+    ["Fines / Salik", "AED 0 pending"],
+    ["Delivery preference", "Hotel lobby handover"],
+    ["Airport pickups", "4 DXB pickups"],
+  ];
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[360px_1fr_340px]">
-      <Card className="min-h-[680px]">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Shared queue</p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-studio-ink">Unified inbox</h2>
-            </div>
-            <Button
-              onClick={() => setAssignedToMe((value) => !value)}
-              size="sm"
-              variant={assignedToMe ? "quiet" : "secondary"}
-            >
-              Mine
-            </Button>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <Input className="h-9" placeholder="Filter conversations..." />
-            <Button className="h-9 w-9 shrink-0 rounded-xl p-0" variant="secondary">
-              <Filter aria-hidden="true" className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardBody className="studio-scrollbar max-h-[560px] space-y-3 overflow-auto">
-          {visibleConversations.slice(0, 16).map((conversation) => (
-            <ConversationListItem
-              active={conversation.id === selected.id}
-              conversation={conversation}
-              key={conversation.id}
-              onClick={() => setSelectedId(conversation.id)}
-            />
-          ))}
-        </CardBody>
-      </Card>
-
-      <Card className="min-h-[680px] overflow-hidden">
-        <CardHeader className="bg-white">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-semibold tracking-[-0.04em] text-studio-ink">{customer.name}</h2>
-                <StatusPill value={selected.status} />
+    <div className="relative space-y-5">
+      <Card className="overflow-hidden border-white/[0.10] bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
+        <CardBody className="p-5">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#31C7B7]">
+                <Sparkles aria-hidden="true" className="h-4 w-4" />
+                Operational AI assistant
               </div>
-              <p className="mt-2 text-sm text-studio-muted">
-                {selected.source} · {selected.stage} · assigned to {selected.assignedTo}
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.055em] text-white">
+                Ask what needs conversion attention right now.
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-white/[0.72]">
+                Query customer waits, pending payments, airport pickups, unassigned leads, and vehicle demand without leaving the inbox.
               </p>
             </div>
-            <Button onClick={() => setAssignedToMe(true)} variant="primary">
-              Assign to me
-            </Button>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {selected.tags.map((tag) => (
-              <Badge key={tag}>{tag}</Badge>
-            ))}
-          </div>
-        </CardHeader>
-        <CardBody className="space-y-5 bg-studio-panel/50">
-          <div className="rounded-2xl border border-studio-line bg-white p-4">
-            <div className="flex items-center gap-2 text-sm font-semibold text-studio-ink">
-              <Sparkles aria-hidden="true" className="h-4 w-4 text-studio-purple" />
-              AI customer summary
-            </div>
-            <p className="mt-2 text-sm leading-6 text-studio-muted">
-              {customer.name} is a {customer.tier.toLowerCase()} customer who prefers {customer.preferredVehicles[0]}.
-              Current thread is about availability, delivery, and payment confirmation.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {selected.messages.map((message) => (
-              <div
-                className={cn("flex", message.from === "team" ? "justify-end" : "justify-start")}
-                key={`${message.time}-${message.text}`}
-              >
-                <div
-                  className={cn(
-                    "max-w-[78%] rounded-2xl border px-4 py-3 shadow-sm",
-                    message.from === "team"
-                      ? "border-studio-purple/20 bg-studio-purple text-white"
-                      : "border-studio-line bg-white text-studio-ink",
-                  )}
+            <div className="grid gap-2 sm:grid-cols-2 xl:w-[560px]">
+              {inboxAiPrompts.map((prompt) => (
+                <button
+                  className="rounded-2xl border border-white/[0.10] bg-white/[0.06] px-3 py-2 text-left text-sm font-medium text-white transition hover:bg-white/[0.10]"
+                  key={prompt}
+                  type="button"
                 >
-                  <p className={cn("text-xs", message.from === "team" ? "text-white/70" : "text-studio-soft")}>
-                    {message.author} · {message.time}
-                  </p>
-                  <p className="mt-1 text-sm leading-6">{message.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="rounded-2xl border border-studio-line bg-white p-3">
-            <div className="flex items-center gap-2">
-              <Input className="border-transparent bg-studio-panel" placeholder="Write a reply or /summarize..." />
-              <Button className="h-10 w-10 shrink-0 rounded-xl p-0" variant="primary">
-                <Send aria-hidden="true" className="h-4 w-4" />
-              </Button>
+                  {prompt}
+                </button>
+              ))}
             </div>
           </div>
         </CardBody>
       </Card>
 
-      <div className="space-y-6">
-        <CustomerSummary customer={customer} />
-        <Card>
-          <CardHeader>
-            <h3 className="font-semibold tracking-[-0.03em] text-studio-ink">Booking context</h3>
+      <div className="grid gap-5 2xl:grid-cols-[360px_minmax(0,1fr)_380px]">
+        <Card className="overflow-hidden border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+          <CardHeader className="bg-white pb-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Shared queue</p>
+                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Unified Inbox</h2>
+              </div>
+              <Button size="sm" variant="primary">
+                <MessagePlus aria-hidden="true" className="h-4 w-4" />
+                New chat
+              </Button>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Input className="h-9 bg-[#F8FAFC]" placeholder="Search name, plate, source..." />
+              <Button className="h-9 w-9 shrink-0 rounded-xl p-0" variant="secondary">
+                <Filter aria-hidden="true" className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="studio-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
+              {inboxQueues.map((queue) => (
+                <button
+                  className={cn(
+                    "shrink-0 rounded-full border px-3 py-2 text-xs font-semibold transition",
+                    activeQueue === queue.label
+                      ? "border-[#31C7B7] bg-[#31C7B7] text-[#061B33]"
+                      : "border-studio-line bg-white text-studio-muted hover:text-[#081B33]",
+                  )}
+                  key={queue.label}
+                  onClick={() => setActiveQueue(queue.label)}
+                  type="button"
+                >
+                  {queue.label} <span className="ml-1 opacity-70">{queue.count}</span>
+                </button>
+              ))}
+            </div>
           </CardHeader>
-          <CardBody className="space-y-3">
-            {bookings
-              .filter((booking) => booking.customerId === customer.id)
-              .slice(0, 3)
-              .map((booking) => {
-                const vehicle = getVehicle(booking.vehicleId);
-                return (
-                  <div className="rounded-xl border border-studio-line bg-studio-panel p-3" key={booking.id}>
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-studio-ink">{vehicle.model}</p>
-                      <StatusPill value={booking.status} />
-                    </div>
-                    <p className="mt-2 text-xs text-studio-muted">
-                      Pickup {booking.pickup} · {formatCurrency(booking.value)}
-                    </p>
-                  </div>
-                );
-              })}
+          <CardBody className="studio-scrollbar max-h-[760px] space-y-2 overflow-auto bg-[#F5F6F8] p-3">
+            {visibleConversations.slice(0, 18).map((conversation, index) => (
+              <ConversationListItem
+                active={conversation.id === selected.id}
+                conversation={conversation}
+                index={index}
+                key={conversation.id}
+                onClick={() => setSelectedId(conversation.id)}
+              />
+            ))}
           </CardBody>
         </Card>
+
+        <Card className="min-h-[760px] overflow-hidden border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+          <CardHeader className="border-[#E3E8EE] bg-white">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-2xl font-semibold tracking-[-0.055em] text-[#081B33]">{customer.name}</h2>
+                  <Badge tone={customer.tier === "VIP" ? "accent" : "neutral"}>{customer.tier}</Badge>
+                  <StatusPill value={selected.status} />
+                </div>
+                <p className="mt-2 text-sm text-studio-muted">
+                  {selected.source} lead · {selected.stage} · assigned to {selected.assignedTo}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary">
+                  <UserCheck aria-hidden="true" className="h-4 w-4" />
+                  Reassign
+                </Button>
+                <Button size="sm" variant="secondary">
+                  <Flag aria-hidden="true" className="h-4 w-4 text-rose-600" />
+                  Priority
+                </Button>
+                <Button size="sm" variant="primary">
+                  <Checks aria-hidden="true" className="h-4 w-4" />
+                  Mark resolved
+                </Button>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {customerState.map((state) => (
+                <span
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold",
+                    state === selected.status || state === selected.stage
+                      ? "border-[#31C7B7] bg-[#E7FAF7] text-[#087A70]"
+                      : state === "Payment pending"
+                        ? "border-amber-200 bg-amber-50 text-amber-700"
+                        : "border-studio-line bg-[#F8FAFC] text-studio-muted",
+                  )}
+                  key={state}
+                >
+                  {state}
+                </span>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-studio-line pt-4">
+              {(["WhatsApp", "Email"] as const).map((channel) => (
+                <button
+                  className={cn(
+                    "rounded-xl border px-3 py-2 text-sm font-semibold transition",
+                    activeChannel === channel
+                      ? "border-[#31C7B7] bg-[#31C7B7] text-[#061B33]"
+                      : "border-studio-line bg-white text-studio-muted hover:text-[#081B33]",
+                  )}
+                  key={channel}
+                  onClick={() => setActiveChannel(channel)}
+                  type="button"
+                >
+                  {channel}
+                </button>
+              ))}
+              <Button size="sm" variant="secondary">
+                <FileInvoice aria-hidden="true" className="h-4 w-4" />
+                Send quote
+              </Button>
+              <Button size="sm" variant="secondary">
+                <ShieldCheck aria-hidden="true" className="h-4 w-4" />
+                Request docs
+              </Button>
+              <Button size="sm" variant="secondary">
+                <CreditCard aria-hidden="true" className="h-4 w-4" />
+                Request payment
+              </Button>
+              <Button size="sm" variant="secondary">
+                <CalendarDays aria-hidden="true" className="h-4 w-4" />
+                New booking
+              </Button>
+            </div>
+          </CardHeader>
+          <CardBody className="space-y-4 bg-[#F5F6F8]">
+            <div className="grid gap-3 lg:grid-cols-[1fr_240px]">
+              <div className="rounded-2xl border border-studio-line bg-white p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[#081B33]">
+                  <Sparkles aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                  AI thread summary
+                </div>
+                <p className="mt-2 text-sm leading-6 text-studio-muted">
+                  {customer.name} is a {customer.tier.toLowerCase()} customer asking about {customer.preferredVehicles[0]}.
+                  Quote is ready, documents are partial, and payment is the next conversion blocker.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-studio-line bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-studio-soft">Collaboration</p>
+                <div className="mt-3 space-y-2 text-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-studio-muted">Owner</span>
+                    <span className="font-semibold text-[#081B33]">{selected.assignedTo}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-studio-muted">Mentions</span>
+                    <span className="font-semibold text-[#081B33]">@finance @fleet</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-studio-muted">Priority</span>
+                    <span className="font-semibold text-amber-700">High intent</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="studio-scrollbar max-h-[430px] space-y-4 overflow-auto rounded-2xl border border-studio-line bg-white p-4">
+              <div className="flex items-center justify-between border-b border-studio-line pb-3">
+                <div className="flex gap-2">
+                  <Button
+                    className={composerMode === "Reply" ? "border-[#31C7B7] bg-[#E7FAF7] text-[#087A70]" : ""}
+                    onClick={() => setComposerMode("Reply")}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Reply
+                  </Button>
+                  <Button
+                    className={composerMode === "Internal note" ? "border-[#31C7B7] bg-[#E7FAF7] text-[#087A70]" : ""}
+                    onClick={() => setComposerMode("Internal note")}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    <Notes aria-hidden="true" className="h-4 w-4" />
+                    Internal notes
+                  </Button>
+                </div>
+                <p className="text-xs font-semibold text-studio-soft">{activeChannel} thread</p>
+              </div>
+
+              {selected.messages.map((message) => (
+                <div
+                  className={cn("flex", message.from === "team" ? "justify-end" : "justify-start")}
+                  key={`${message.time}-${message.text}`}
+                >
+                  <div
+                    className={cn(
+                      "max-w-[78%] rounded-2xl border px-4 py-3 shadow-sm",
+                      message.from === "team"
+                        ? "border-[#31C7B7]/30 bg-[#081B33] text-white"
+                        : "border-studio-line bg-[#F8FAFC] text-[#081B33]",
+                    )}
+                  >
+                    <p className={cn("text-xs", message.from === "team" ? "text-white/[0.72]" : "text-studio-soft")}>
+                      {message.author} · {message.time}
+                    </p>
+                    <p className="mt-1 text-sm leading-6">{message.text}</p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+                  <Notes aria-hidden="true" className="h-4 w-4" />
+                  Internal note
+                </div>
+                <p className="mt-1 text-sm leading-5 text-amber-800/80">
+                  @finance verify payment screenshot before confirming delivery. Customer is likely to convert if link is sent now.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 lg:grid-cols-[1fr_260px]">
+              <div className="rounded-2xl border border-studio-line bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-studio-soft">Attachments</p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {inboxAttachments.map((attachment) => {
+                    const AttachmentIcon = attachment.icon;
+                    return (
+                      <div className="rounded-xl border border-studio-line bg-[#F8FAFC] p-3" key={attachment.label}>
+                        <div className="flex items-center gap-2">
+                          <AttachmentIcon aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                          <p className="text-sm font-semibold text-[#081B33]">{attachment.label}</p>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between text-xs">
+                          <span className="text-studio-muted">{attachment.type}</span>
+                          <span className="font-semibold text-studio-muted">{attachment.status}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {["Image", "PDF", "Passport", "Emirates ID", "Driving License", "Payment screenshot", "Rental contract"].map((item) => (
+                    <Badge className="bg-white" key={item}>{item}</Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-studio-line bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-studio-soft">Quick replies</p>
+                <div className="mt-3 space-y-2">
+                  {inboxQuickReplies.map((reply) => (
+                    <button
+                      className="w-full rounded-xl border border-studio-line bg-[#F8FAFC] px-3 py-2 text-left text-sm font-medium text-[#081B33] transition hover:border-[#31C7B7]"
+                      key={reply}
+                      type="button"
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-studio-line bg-white p-3">
+              <div className="mb-3 flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary">
+                  <Template aria-hidden="true" className="h-4 w-4" />
+                  Templates
+                </Button>
+                <Button size="sm" variant="secondary">
+                  <Paperclip aria-hidden="true" className="h-4 w-4" />
+                  Upload file
+                </Button>
+                <Button size="sm" variant="secondary">
+                  <Microphone aria-hidden="true" className="h-4 w-4" />
+                  Voice note
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  className="border-transparent bg-[#F8FAFC]"
+                  placeholder={composerMode === "Reply" ? `Reply via ${activeChannel}...` : "Write internal note and mention @team..."}
+                />
+                <Button className="h-10 w-10 shrink-0 rounded-xl p-0" variant="primary">
+                  <Send aria-hidden="true" className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <div className="space-y-5">
+          <Card className="overflow-hidden border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+            <CardHeader className="bg-[#081B33] text-white">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Customer intelligence</p>
+                  <h3 className="mt-1 text-xl font-semibold tracking-[-0.04em]">{customer.name}</h3>
+                  <p className="mt-1 text-sm text-white/[0.68]">{customer.location} · customer since {customer.since}</p>
+                </div>
+                <Badge className="border-white/[0.10] bg-white/[0.08] text-white">{customer.tier}</Badge>
+              </div>
+            </CardHeader>
+            <CardBody className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                {intelligenceCards.map(([label, value]) => (
+                  <div className="rounded-xl border border-studio-line bg-[#F8FAFC] p-3" key={label}>
+                    <p className="text-xs text-studio-soft">{label}</p>
+                    <p className="mt-1 text-sm font-semibold text-[#081B33]">{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-studio-soft">Preferred cars</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {customer.preferredVehicles.map((vehicle) => (
+                    <Badge key={vehicle}>{vehicle}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-studio-soft">Open bookings</p>
+                <div className="mt-3 space-y-2">
+                  {(currentBookings.length ? currentBookings : bookings.slice(0, 1)).map((booking) => {
+                    const vehicle = getVehicle(booking.vehicleId);
+                    return (
+                      <div className="rounded-xl border border-studio-line bg-[#F8FAFC] p-3" key={booking.id}>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-semibold text-[#081B33]">{vehicle.model}</p>
+                          <StatusPill value={booking.payment} />
+                        </div>
+                        <p className="mt-1 text-xs text-studio-muted">
+                          Pickup {booking.pickup} · {formatCurrency(booking.value)}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+            <CardHeader>
+              <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Customer timeline</h3>
+            </CardHeader>
+            <CardBody className="space-y-3">
+              {inboxTimeline.map((item) => (
+                <div className="flex gap-3" key={item.label}>
+                  <div className={cn(
+                    "mt-1 h-2.5 w-2.5 rounded-full",
+                    item.status === "Done" ? "bg-emerald-500" : item.status === "Open" ? "bg-amber-500" : "bg-studio-soft",
+                  )} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#081B33]">{item.label}</p>
+                    <p className="mt-0.5 text-xs text-studio-muted">{item.time} · {item.status}</p>
+                  </div>
+                </div>
+              ))}
+            </CardBody>
+          </Card>
+        </div>
+      </div>
+
+      <div className="fixed bottom-5 right-5 z-40 hidden rounded-2xl border border-studio-line bg-white p-2 shadow-[0_18px_60px_rgba(8,27,51,0.18)] xl:block">
+        <div className="flex gap-2">
+          {inboxQuickActions.map((action) => {
+            const ActionIcon = action.icon;
+            return (
+              <button
+                className="group flex h-11 w-11 items-center justify-center rounded-xl text-studio-muted transition hover:bg-[#E7FAF7] hover:text-[#087A70]"
+                key={action.label}
+                title={action.label}
+                type="button"
+              >
+                <ActionIcon aria-hidden="true" className="h-5 w-5" />
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
