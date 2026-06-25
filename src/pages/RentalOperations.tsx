@@ -2556,43 +2556,189 @@ function DocumentsView() {
 }
 
 function SettingsView() {
+  const teamMembers = [
+    ["Amelia", "Super Admin", "Active"],
+    ["Noah", "Concierge", "Active"],
+    ["Sofia", "Fleet manager", "Active"],
+    ["James", "Finance", "Active"],
+    ["Riya", "Sales", "Active"],
+    ["Omar", "Viewer", "Deactivated"],
+  ];
+  const roles = ["Super Admin", "Admin", "Concierge", "Fleet manager", "Finance", "Sales", "Viewer"];
+  const bossOnlyPermissions = [
+    "Delete bookings",
+    "Edit payments",
+    "Refund deposits",
+    "Export data",
+    "Change rules",
+    "Restore versions",
+  ];
+  const versionHistory = [
+    ["Amelia", "Changed default deposit", "Today 10:42", "AED 3,000", "AED 5,000"],
+    ["James", "Updated Salik charge", "Yesterday 16:20", "AED 4", "AED 5"],
+    ["Sofia", "Changed cleaning escalation", "18 Jun 12:05", "60 minutes", "45 minutes"],
+  ];
+
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-      <div className="space-y-6">
-        <SettingsPanel
-          icon={UsersRound}
-          title="Team roles"
-          description="Concierge, fleet, finance, and manager roles with clear ownership of inbox, bookings, documents, and vehicle status."
-          items={["Amelia · Operations lead", "Noah · Concierge", "Sofia · Fleet coordinator", "James · Finance"]}
-        />
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-white bg-[#081B33] text-white shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
+        <CardBody className="flex flex-col gap-4 p-5 xl:flex-row xl:items-center xl:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Settings</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.055em]">Dreamz operational control center</h2>
+            <p className="mt-2 text-sm text-white/[0.68]">
+              Manage access, rules, security, notifications, integrations, and version history.
+            </p>
+          </div>
+          <Badge className="border-white/[0.10] bg-white/[0.08] text-white">Boss controls protected</Badge>
+        </CardBody>
+      </Card>
+
+      <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+        <Card>
+          <CardHeader>
+            <SectionHeading
+              action={<Button variant="primary">Add member</Button>}
+              eyebrow="Access"
+              title="Team & Permissions"
+            />
+          </CardHeader>
+          <CardBody className="space-y-3">
+            <div className="grid gap-3 rounded-2xl bg-[#F8FAFC] px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft md:grid-cols-[1fr_0.8fr_0.5fr_1fr]">
+              <span>Member</span>
+              <span>Role</span>
+              <span>Status</span>
+              <span>Actions</span>
+            </div>
+            {teamMembers.map(([name, role, status]) => (
+              <div className="grid gap-3 rounded-2xl border border-studio-line bg-white p-4 md:grid-cols-[1fr_0.8fr_0.5fr_1fr] md:items-center" key={name}>
+                <p className="font-semibold text-[#081B33]">{name}</p>
+                <select className={editFieldClass} defaultValue={role}>
+                  {roles.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+                <StatusPill value={status === "Active" ? "Verified" : "Completed"} />
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="secondary">Edit role</Button>
+                  <Button size="sm" variant="secondary">Remove</Button>
+                  <Button size="sm" variant="secondary">Deactivate</Button>
+                </div>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <SectionHeading eyebrow="Boss only" title="Permission Controls" />
+          </CardHeader>
+          <CardBody className="space-y-3">
+            {bossOnlyPermissions.map((permission) => (
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-[#F8FAFC] p-3" key={permission}>
+                <p className="text-sm font-medium text-[#081B33]">{permission}</p>
+                <Badge tone="accent">Super Admin</Badge>
+              </div>
+            ))}
+            <p className="text-sm leading-6 text-studio-muted">
+              Staff roles have limited permissions by default. Sensitive actions require Super Admin approval.
+            </p>
+          </CardBody>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
         <SettingsPanel
           icon={Activity}
-          title="Automation rules"
-          description="Route messages by channel, status, customer tier, and booking stage without creating a heavy CRM workflow."
-          items={["VIP WhatsApp enquiries assign to operations lead", "Pending deposit reminders after 25 minutes", "Cleaning task created on every return"]}
+          title="Notification Settings"
+          description="Control operational alerts for the team."
+          items={[
+            "New leads · notify concierge instantly",
+            "Overdue payments · alert finance after 30 minutes",
+            "Maintenance · alert fleet manager",
+            "Expiring documents · alert documents team",
+            "Unassigned inbox · alert operations lead",
+          ]}
         />
         <SettingsPanel
+          icon={ShieldCheck}
+          title="Security Settings"
+          description="Boss-only controls for login safety and device access."
+          items={[
+            "2FA required for admins",
+            "Active sessions · 8 devices",
+            "Login history · last 30 days",
+            "Device management · revoke access",
+          ]}
+        />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <SettingsPanel
           icon={CreditCard}
-          title="Payment settings"
-          description="Deposit rules, balance reminders, refund status, and payment exceptions for high-value rentals."
-          items={["Default security deposit: AED 5,000", "Balance due before delivery", "Finance review for rentals above AED 12,000"]}
+          title="Business Rules"
+          description="Pricing and payment defaults used across bookings."
+          items={[
+            "Default deposit · AED 5,000",
+            "No-deposit fee · AED 350",
+            "Salik charge · AED 5/pass",
+            "Delivery fee · AED 150 standard",
+            "Overtime charge · AED 120/hour",
+          ]}
+        />
+        <SettingsPanel
+          icon={Wrench}
+          title="Fleet Rules"
+          description="Vehicle readiness, cleaning, and escalation rules."
+          items={[
+            "Maintenance interval · every 10,000km",
+            "Cleaning required after every return",
+            "Overdue return escalation · 30 minutes",
+            "Service due soon warning · 500km",
+          ]}
         />
       </div>
 
       <Card>
         <CardHeader>
-          <SectionHeading eyebrow="Sources" title="Connected channels" />
+          <SectionHeading eyebrow="Audit trail" title="Version History" />
         </CardHeader>
         <CardBody className="space-y-3">
-          {connectedChannels.map((channel) => {
-            const ChannelIcon = channel.icon;
+          {versionHistory.map(([person, change, time, oldValue, newValue]) => (
+            <div className="grid gap-3 rounded-2xl border border-studio-line bg-white p-4 md:grid-cols-[0.8fr_1.2fr_0.8fr_0.8fr_0.8fr_auto] md:items-center" key={`${person}-${change}`}>
+              <p className="text-sm font-semibold text-[#081B33]">{person}</p>
+              <p className="text-sm text-studio-muted">{change}</p>
+              <p className="text-xs text-studio-soft">{time}</p>
+              <p className="text-xs text-studio-muted">Old: {oldValue}</p>
+              <p className="text-xs font-semibold text-[#081B33]">New: {newValue}</p>
+              <Button size="sm" variant="secondary">Restore</Button>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <SectionHeading eyebrow="Sources" title="Connected Channels" />
+        </CardHeader>
+        <CardBody className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {[
+            ["WhatsApp numbers", "+971 50 000 0000 · +971 52 000 0000", MessageCircle],
+            ["Meta Ads", "Lead forms connected", TrendingUp],
+            ["Google Ads", "Search leads importing", Search],
+            ["Website forms", "Dreamz UAE form active", Inbox],
+            ["Payment links", "Checkout links enabled", CreditCard],
+            ["Shared email", "reservations@dreamzuae.com", Mail],
+          ].map(([label, detail, Icon]) => {
+            const ChannelIcon = Icon as AppIcon;
             return (
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-studio-line bg-studio-panel p-3" key={channel.label}>
+              <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-4" key={String(label)}>
                 <div className="flex items-center gap-3">
-                  <ChannelIcon aria-hidden="true" className="h-4 w-4 text-studio-muted" />
-                  <p className="text-sm font-medium text-studio-ink">{channel.label}</p>
+                  <ChannelIcon aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                  <p className="text-sm font-semibold text-[#081B33]">{label}</p>
                 </div>
-                <Badge tone="success">{channel.status}</Badge>
+                <p className="mt-2 text-sm text-studio-muted">{detail}</p>
+                <Badge className="mt-3" tone="success">Connected</Badge>
               </div>
             );
           })}
