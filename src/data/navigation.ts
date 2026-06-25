@@ -8,7 +8,7 @@ import {
   IconSettings,
   IconUsers,
 } from "@tabler/icons-react";
-import type { ComponentType } from "react";
+import type { ComponentType, SVGProps } from "react";
 import type { RouteKey } from "../types";
 
 export type StudioRoute = {
@@ -16,7 +16,7 @@ export type StudioRoute = {
   label: string;
   path: string;
   description: string;
-  icon: ComponentType<{ "aria-hidden"?: boolean; className?: string }>;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
 };
 
 export const routes: StudioRoute[] = [

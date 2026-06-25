@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 import {
   IconActivity as Activity,
   IconAlertTriangle as AlertCircle,
@@ -26,11 +26,9 @@ import {
   IconShieldCheck as ShieldCheck,
   IconSparkles as Sparkles,
   IconStar as Star,
-  IconClockHour4 as Timer,
   IconTrendingUp as TrendingUp,
   IconUserCircle as UserRound,
   IconUsers as UsersRound,
-  IconWallet as Wallet,
   IconTool as Wrench,
 } from "@tabler/icons-react";
 import { Badge } from "../components/ui/Badge";
@@ -58,7 +56,7 @@ type RentalOperationsProps = {
   routeKey: RouteKey;
 };
 
-type AppIcon = ComponentType<{ "aria-hidden"?: boolean; className?: string }>;
+type AppIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 const statusStyles: Record<string, string> = {
   Available: "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -375,7 +373,6 @@ function DashboardView() {
       ["Available", "Booked", "Cleaning", "Maintenance", "Delivered"].includes(vehicle.status),
     )
     .slice(0, 10);
-  const todaysRevenue = bookings.slice(0, 12).reduce((total, booking) => total + booking.value, 0);
   const carsInService =
     vehicles.filter((vehicle) => vehicle.status === "Cleaning").length +
     vehicles.filter((vehicle) => vehicle.status === "Maintenance").length;
