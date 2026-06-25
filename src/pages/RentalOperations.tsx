@@ -2106,6 +2106,10 @@ function AnalyticsView() {
                   <span className="font-semibold">{b2bVehicles.length}</span>
                 </div>
                 <div className="flex justify-between gap-3">
+                  <span className="text-white/[0.62]">Avg booking value</span>
+                  <span className="font-semibold">{formatCurrency(b2bAvgBooking)}</span>
+                </div>
+                <div className="flex justify-between gap-3">
                   <span className="text-white/[0.62]">Avg duration</span>
                   <span className="font-semibold">21.4 days</span>
                 </div>
