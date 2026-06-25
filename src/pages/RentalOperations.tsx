@@ -1803,18 +1803,33 @@ function AiConceptStrip() {
 
 function HeroQuestionBar() {
   return (
-    <Card className="mb-6 overflow-hidden border-white/[0.10] bg-[#081B33] shadow-[0_24px_80px_rgba(8,27,51,0.16)]">
+    <Card className="mb-6 overflow-hidden border-studio-line bg-white shadow-[0_18px_60px_rgba(8,27,51,0.08)]">
       <CardBody className="relative p-5 sm:p-6">
-        <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-gradient-to-l from-[#31C7B7]/20 to-transparent md:block" />
+        <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-gradient-to-l from-[#E7FAF7] to-transparent md:block" />
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-sm font-semibold text-white">
+            <div className="flex items-center gap-2 text-sm font-semibold text-black">
               <Plane aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
               Ask the operation anything
             </div>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/[0.84]">
-              Try: "Search for whose payment is pending", "Which SUVs are available today?", "Who has not replied to customers?", or "Show today's DXB pickups."
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-black">
+              Try these demo searches:
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {[
+                "Search for whose payment is pending",
+                "Which SUVs are available today?",
+                "Who has not replied to customers?",
+                "Show today's DXB pickups",
+              ].map((prompt) => (
+                <span
+                  className="rounded-full border border-studio-line bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-black"
+                  key={prompt}
+                >
+                  {prompt}
+                </span>
+              ))}
+            </div>
           </div>
           <Button className="border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" variant="primary">
             <Sparkles aria-hidden="true" className="h-4 w-4" />
