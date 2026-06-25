@@ -2578,6 +2578,50 @@ function SettingsView() {
     { label: "Payment links", detail: "Checkout links enabled", icon: CreditCard },
     { label: "Shared email", detail: "reservations@dreamzuae.com", icon: Mail },
   ];
+  const businessRules = [
+    ["Default security deposit", "AED 5,000"],
+    ["No-deposit fee", "AED 350"],
+    ["Salik rule", "AED 5 per crossing"],
+    ["Late return fee", "AED 120/hour"],
+    ["Extra km charge", "AED 3/km"],
+    ["Delivery fee", "AED 150 standard"],
+    ["Abu Dhabi surcharge", "AED 450"],
+  ];
+  const operationalDefaults = [
+    ["Auto-assign leads", "On"],
+    ["Payment reminder timer", "30 min"],
+    ["Reserve hold duration", "45 min"],
+    ["Overdue escalation timer", "30 min"],
+    ["Return inspection required", "On"],
+  ];
+  const approvalRules = [
+    ["High-value rentals", "Finance approval"],
+    ["VIP bookings", "Manager approval"],
+    ["No-deposit bookings", "Ops approval"],
+  ];
+  const systemPreferences = [
+    ["WhatsApp alerts", "On"],
+    ["Email alerts", "On"],
+    ["Calendar sync", "On"],
+    ["Daily reports", "On"],
+    ["Dark mode", "Off"],
+  ];
+
+  const Toggle = ({ enabled }: { enabled: boolean }) => (
+    <span
+      className={cn(
+        "relative inline-flex h-6 w-10 items-center rounded-full transition",
+        enabled ? "bg-[#31C7B7]" : "bg-studio-line",
+      )}
+    >
+      <span
+        className={cn(
+          "h-4 w-4 rounded-full bg-white shadow-sm transition",
+          enabled ? "translate-x-5" : "translate-x-1",
+        )}
+      />
+    </span>
+  );
 
   return (
     <div className="space-y-6">
@@ -2673,31 +2717,87 @@ function SettingsView() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <SettingsPanel
-          icon={CreditCard}
-          title="Business Rules"
-          description="Pricing and payment defaults used across bookings."
-          items={[
-            "Default deposit · AED 5,000",
-            "No-deposit fee · AED 350",
-            "Salik charge · AED 5/pass",
-            "Delivery fee · AED 150 standard",
-            "Overtime charge · AED 120/hour",
-          ]}
-        />
-        <SettingsPanel
-          icon={Wrench}
-          title="Fleet Rules"
-          description="Vehicle readiness, cleaning, and escalation rules."
-          items={[
-            "Maintenance interval · every 10,000km",
-            "Cleaning required after every return",
-            "Overdue return escalation · 30 minutes",
-            "Service due soon warning · 500km",
-          ]}
-        />
-      </div>
+      <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+        <CardHeader>
+          <SectionHeading
+            action={<Button variant="primary">Save rule changes</Button>}
+            eyebrow="Rules"
+            title="Business Rules & Operational Defaults"
+          />
+        </CardHeader>
+        <CardBody className="grid gap-5 xl:grid-cols-2">
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <CreditCard aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+              <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Business Rules</h3>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {businessRules.map(([label, value]) => (
+                <div className="rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={label}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-studio-soft">{label}</p>
+                  <input className={cn(editFieldClass, "mt-2")} defaultValue={value} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-5">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <Activity aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Operational Defaults</h3>
+              </div>
+              <div className="space-y-2">
+                {operationalDefaults.map(([label, value]) => {
+                  const isToggle = value === "On" || value === "Off";
+                  return (
+                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-studio-line bg-[#F8FAFC] p-3" key={label}>
+                      <p className="text-sm font-medium text-[#081B33]">{label}</p>
+                      {isToggle ? (
+                        <Toggle enabled={value === "On"} />
+                      ) : (
+                        <input className={cn(editFieldClass, "w-28 text-right")} defaultValue={value} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <ShieldCheck aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                  <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">Approval Rules</h3>
+                </div>
+                <div className="space-y-2">
+                  {approvalRules.map(([label, value]) => (
+                    <div className="rounded-2xl border border-studio-line bg-white p-3" key={label}>
+                      <p className="text-sm font-semibold text-[#081B33]">{label}</p>
+                      <p className="mt-1 text-xs text-studio-muted">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <Wrench aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
+                  <h3 className="font-semibold tracking-[-0.03em] text-[#081B33]">System Preferences</h3>
+                </div>
+                <div className="space-y-2">
+                  {systemPreferences.map(([label, value]) => (
+                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-studio-line bg-white p-3" key={label}>
+                      <p className="text-sm font-medium text-[#081B33]">{label}</p>
+                      <Toggle enabled={value === "On"} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
 
       <Card>
         <CardHeader>
