@@ -211,6 +211,43 @@ const dashboardTasks: {
   },
 ];
 
+const dashboardAssignableTasks: {
+  title: string;
+  context: string;
+  due: string;
+  priority: "High" | "Medium" | "Low";
+  suggestedAssignee: string;
+}[] = [
+  {
+    title: "Call overdue BMW 735i customer",
+    context: "Return overdue · Downtown Dubai",
+    due: "Now",
+    priority: "High",
+    suggestedAssignee: "Amelia",
+  },
+  {
+    title: "Collect Escalade deposit balance",
+    context: "Payment blocker · Palm Jumeirah delivery",
+    due: "10:20",
+    priority: "High",
+    suggestedAssignee: "Noah",
+  },
+  {
+    title: "Assign cleaner to Nissan Patrol",
+    context: "Prep delay · pickup at 14:30",
+    due: "10:45",
+    priority: "Medium",
+    suggestedAssignee: "Omar",
+  },
+  {
+    title: "Request Emirates ID upload",
+    context: "Document missing · tourist booking",
+    due: "11:00",
+    priority: "Medium",
+    suggestedAssignee: "Sofia",
+  },
+];
+
 const connectedChannels: {
   label: string;
   status: string;
@@ -680,58 +717,86 @@ function DashboardView() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-studio-soft">Utility</p>
-                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Available Cars Quick Assign</h2>
+                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#081B33]">Available Tasks Quick Assign</h2>
               </div>
-              <Button size="sm" variant="primary">Create booking</Button>
+              <Button size="sm" variant="primary">Create task</Button>
             </div>
           </CardHeader>
           <CardBody className="grid gap-3 pt-0 lg:grid-cols-2">
-            {availableCars.map((vehicle, index) => (
-              <div
-                className="grid gap-3 rounded-2xl border border-studio-line bg-white p-3 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center"
-                key={vehicle.id}
-              >
-                <div>
-                  <p className="text-sm font-semibold text-[#081B33]">{vehicle.model}</p>
-                  <p className="mt-1 text-xs text-studio-muted">
-                    {formatCurrency(vehicle.dailyRate)}/day · {vehicle.plate}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
-                      Idle {["18m", "42m", "1h 05m", "2h 10m", "3h 20m"][index % 5]}
-                    </span>
-                    <span className="rounded-full bg-studio-panel px-2.5 py-1 font-medium text-studio-muted">
-                      Near {vehicle.location}
+            {dashboardAssignableTasks.map((task) => {
+              const priorityClass =
+                task.priority === "High"
+                  ? "bg-rose-50 text-rose-700"
+                  : task.priority === "Medium"
+                    ? "bg-amber-50 text-amber-700"
+                    : "bg-emerald-50 text-emerald-700";
+
+              return (
+                <div
+                  className="rounded-2xl border border-studio-line bg-white p-3 shadow-sm"
+                  key={task.title}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold leading-5 text-[#081B33]">{task.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-studio-muted">{task.context}</p>
+                    </div>
+                    <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", priorityClass)}>
+                      {task.priority}
                     </span>
                   </div>
+                  <div className="mt-3 grid gap-2 rounded-xl bg-[#F8FAFC] p-2 text-xs sm:grid-cols-3">
+                    <div>
+                      <p className="text-studio-soft">Due</p>
+                      <p className="mt-0.5 font-semibold text-[#081B33]">{task.due}</p>
+                    </div>
+                    <div>
+                      <p className="text-studio-soft">Assign to</p>
+                      <p className="mt-0.5 font-semibold text-[#081B33]">{task.suggestedAssignee}</p>
+                    </div>
+                    <div className="sm:text-right">
+                      <Button className="h-8 px-3" size="sm" variant="secondary">Assign</Button>
+                    </div>
+                  </div>
                 </div>
-                <Button size="sm" variant="secondary">Assign booking</Button>
-              </div>
-            ))}
+              );
+            })}
           </CardBody>
         </Card>
 
         <Card className="border-white bg-[#081B33] text-white shadow-[0_18px_60px_rgba(8,27,51,0.12)]">
           <CardBody className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Payments & docs</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.04em]">Blocking handovers</h2>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#31C7B7]">Payments & docs</p>
+                <h2 className="mt-2 text-xl font-semibold tracking-[-0.04em]">Blocking handovers</h2>
+              </div>
+              <Badge className="border-white/[0.10] bg-white/[0.08] text-white">10 blockers</Badge>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-white/[0.70]">
+              These items must clear before dispatch can release vehicles to customers.
+            </p>
             <div className="mt-5 space-y-3">
               {[
-                ["5", "Deposits pending", "Send payment links"],
-                ["3", "Missing documents", "Request Emirates ID"],
-                ["2", "Agreements unsigned", "Send e-sign link"],
-              ].map(([value, label, action]) => (
+                ["5", "Deposits pending", "AED 18.4k open", "Send payment links"],
+                ["3", "Missing documents", "2 Emirates IDs, 1 visit visa", "Request uploads"],
+                ["2", "Agreements unsigned", "Escalade and Tahoe", "Send e-sign links"],
+              ].map(([value, label, detail, action]) => (
                 <div className="rounded-2xl border border-white/[0.10] bg-white/[0.06] p-3" key={label}>
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-2xl font-semibold tracking-[-0.05em]">{value}</p>
-                    <span className="rounded-full bg-[#31C7B7]/15 px-2.5 py-1 text-xs font-semibold text-[#31C7B7]">
+                    <span className="rounded-full bg-[#31C7B7]/20 px-2.5 py-1 text-xs font-semibold text-[#8FF3E9]">
                       {action}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-white/[0.62]">{label}</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{label}</p>
+                  <p className="mt-0.5 text-xs leading-5 text-white/[0.64]">{detail}</p>
                 </div>
               ))}
             </div>
+            <Button className="mt-4 w-full border-[#31C7B7] bg-[#31C7B7] text-[#061B33] hover:bg-[#28b5a7]" variant="primary">
+              Open blocker queue
+            </Button>
           </CardBody>
         </Card>
       </section>
@@ -1587,18 +1652,18 @@ function SettingsPanel({
 
 function AiConceptStrip() {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-white shadow-[0_18px_60px_rgba(8,27,51,0.06)]">
+      <CardHeader className="bg-white">
         <div className="flex items-center gap-2">
           <Bot aria-hidden="true" className="h-4 w-4 text-studio-purple" />
-          <h2 className="font-semibold tracking-[-0.03em] text-studio-ink">AI concepts, only where useful</h2>
+          <h2 className="font-semibold tracking-[-0.03em] text-[#081B33]">AI concepts, only where useful</h2>
         </div>
       </CardHeader>
       <CardBody className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {aiDemoCards.map((card) => (
-          <div className="rounded-2xl border border-studio-line bg-studio-panel p-4" key={card.title}>
-            <p className="text-sm font-semibold text-studio-ink">{card.title}</p>
-            <p className="mt-2 text-sm leading-6 text-studio-muted">{card.body}</p>
+          <div className="rounded-2xl border border-studio-line bg-white p-4 shadow-sm" key={card.title}>
+            <p className="text-sm font-semibold text-[#081B33]">{card.title}</p>
+            <p className="mt-2 text-sm leading-6 text-[#3F4B5D]">{card.body}</p>
           </div>
         ))}
       </CardBody>
@@ -1617,7 +1682,7 @@ function HeroQuestionBar() {
               <Plane aria-hidden="true" className="h-4 w-4 text-[#31C7B7]" />
               Ask the operation anything
             </div>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/[0.62]">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/[0.84]">
               Try: "Which SUVs are available today?", "Who has not replied to VIP customers?", or "Where is every delivered vehicle?"
             </p>
           </div>
